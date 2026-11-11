@@ -591,11 +591,13 @@
     <div class="version-badge-row">
         <div class="version-badge-wrap">
             <div class="version-badge-line">
-                <div class="system-version-badge">V-Pack Estimator v2.4.7</div>
+                <div class="system-version-badge">V-Pack Estimator v2.4.9</div>
                 <button type="button" class="version-toggle-btn" id="versionToggleBtn" onclick="toggleVersionNotes()" aria-expanded="false" aria-controls="versionNotes">📜 ดูรายการอัปเดต ▾</button>
             </div>
             <div class="version-notes" id="versionNotes">
                 <ul>
+                    <li><b>v2.4.9</b> — ต้นทุนจริงจากบิล: เพิ่ม % Markup จริง และโชว์ค่าที่ประเมินไว้เทียบ</li>
+                    <li><b>v2.4.8</b> — เพิ่ม "🧾 ต้นทุนจริงจากบิล" (บล็อก/เพลท) คำนวณกำไรจริงโดยไม่เปลี่ยนราคาที่เสนอ + แสดงในใบสรุปต้นทุนและตารางประวัติ</li>
                     <li><b>v2.4.7</b> — เปลี่ยนชื่อปุ่มเป็น "ล้างประวัติในเครื่องนี้ (Sheet ไม่หาย)" ให้ชัดว่าไม่ได้ลบข้อมูลใน Google Sheets</li>
                     <li><b>v2.4.6</b> — ตารางประวัติ: คลิกหัวคอลัมน์เพื่อเรียง (วันที่ ประเภท ชื่องาน รหัสกระดาษ ขนาด จำนวน ยอดสุทธิ กำไร สถานะ) คลิกซ้ำ = กลับลำดับ</li>
                     <li><b>v2.4.5</b> — หน้าต่างหมึก: พิมพ์ความยาว (เมตร) เองได้ · หน้าต่างเวลา: พิมพ์จำนวนดวง/ดวงต่อแถวได้</li>
@@ -935,6 +937,19 @@
             <div style="margin-top:6px;background:#fff;border:1px dashed #fca5a5;border-radius:6px;padding:6px 8px;font-size:0.78rem;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span>ค่าบล็อกที่กรอกไว้: <b id="r_repeatPlateOriginal">1,000.00 บาท</b></span><span>→ ค่าบล็อกที่คิดจริง: <b id="r_repeatPlateApplied" style="color:#991b1b;">1,000.00 บาท</b></span></div>
         </div>
 
+        <details class="grp" id="grp_actual" data-key="actual">
+            <summary>🧾 ต้นทุนจริงจากบิล <span class="grp-note">(ใส่หลังได้บิล — ราคาขายไม่เปลี่ยน)</span><span class="grp-sum" id="grpSum_actual"></span></summary>
+            <div class="form-group">
+                <label>ค่าบล็อกไดคัทจริง (บาท ก่อน VAT) <span class="hint-text">(เว้นว่าง = ใช้ค่าที่ประเมิน)</span></label>
+                <input type="number" id="r_actualBlock" value="" placeholder="ตามบิล" oninput="calcRoll()">
+            </div>
+            <div class="form-group">
+                <label>ค่าเพลทพิมพ์+ฟิล์มจริง (บาท ก่อน VAT) <span class="hint-text">(เว้นว่าง = ใช้ค่าที่ประเมิน)</span></label>
+                <input type="number" id="r_actualPlate" value="" placeholder="ตามบิล" oninput="calcRoll()">
+            </div>
+            <div class="calc-hint show" id="r_actualHint">ระบบจะคำนวณ "กำไรจริง" จากราคาที่เสนอไปแล้ว − ต้นทุนจริง โดยไม่เปลี่ยนราคาขาย</div>
+        </details>
+
         <div class="checkbox-group" style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:6px; padding:6px 8px; margin-top:4px;">
             <div class="checkbox-left">
                 <input type="checkbox" id="r_blankStamp" onchange="toggleBlankStamp()">
@@ -1113,6 +1128,12 @@
             <div class="result-row" style="color:#15803d; font-size:0.85rem;"><span>% กำไรจากยอดขาย (Margin):</span><b id="r_resProfitMargin">0 %</b></div>
             <div id="r_marginGuardNote"></div>
             <div class="result-row" style="color:#0369a1; font-size:0.85rem;"><span>% กำไรจากต้นทุน (Markup):</span><b id="r_resProfitMarkup">0 %</b></div>
+            <div id="r_actualRows" style="display:none; margin-top:6px; padding:6px 8px; background:#ecfdf5; border:1px dashed #34d399; border-radius:6px;">
+                <div class="result-row" style="color:#065f46;"><span>🧾 ต้นทุนรวมจริง (ตามบิล):</span><b id="r_resActualCost">-</b></div>
+                <div class="result-row" style="color:#065f46;"><span>🧾 กำไรจริง:</span><b id="r_resActualProfit">-</b></div>
+                <div class="result-row" style="color:#065f46;"><span>🧾 % Margin จริง:</span><b id="r_resActualMargin">-</b></div>
+                <div class="result-row" style="color:#065f46;"><span>🧾 % Markup จริง:</span><b id="r_resActualMarkup">-</b></div>
+            </div>
         </div>
 
         <div id="r_checklist" class="pre-checklist"></div>
@@ -2333,6 +2354,9 @@
             document.getElementById('r_cylRepeat').value = "";
             document.getElementById('r_cylTeeth').value = "";
             document.getElementById('r_inkMetersOverride').value = "";
+            document.getElementById('r_actualBlock').value = "";
+            document.getElementById('r_actualPlate').value = "";
+            const ag = document.getElementById('grp_actual'); if (ag) delete ag.dataset.autoOpened;
             document.getElementById('r_rowsLock').checked = false;
             document.getElementById('r_optLaminate').checked = false;
             document.getElementById('r_lamPrice').value = "13.00";
@@ -2740,6 +2764,8 @@
             inkRates: getInkRates(),
             inkMetersOverride: Math.max(0, numVal('r_inkMetersOverride', 0)),
             fileFee: numVal('r_fileFee', 0),
+            actualBlock: (document.getElementById('r_actualBlock').value === '' ? null : numVal('r_actualBlock', 0)),
+            actualPlate: (document.getElementById('r_actualPlate').value === '' ? null : numVal('r_actualPlate', 0)),
             workType: document.getElementById('r_workType').value,
             speed: numVal('r_speed', 0), speedUnit: document.getElementById('r_speedUnit').value,
             setupMin: Math.max(0, numVal('r_setupMin', 0)),
@@ -2887,6 +2913,14 @@
         const vatAmount = subtotal * (p.vat / 100);
         const netTotal = subtotal + vatAmount;
         const marginPercent = salesRevenue > 0 ? (profit / salesRevenue) * 100 : 0;
+        // ต้นทุนจริงจากบิล: เปลี่ยนเฉพาะต้นทุน/กำไร — ราคาขายยังเป็นราคาที่ประเมินไว้
+        const hasActual = p.actualBlock !== null || p.actualPlate !== null;
+        const actualCost = totalProductionCost
+            - (p.actualBlock !== null ? plateCost - p.actualBlock : 0)
+            - (p.actualPlate !== null ? dieCost - p.actualPlate : 0);
+        const actualProfit = salesRevenue - actualCost - commissionCost;
+        const actualMargin = salesRevenue > 0 ? actualProfit / salesRevenue * 100 : 0;
+        const actualMarkup = actualCost > 0 ? actualProfit / actualCost * 100 : 0;
         const markupPercent = totalProductionCost > 0 ? (profit / totalProductionCost) * 100 : 0;
 
         return {
@@ -2897,7 +2931,7 @@
             speed, runMin, machineMin, pass2Min, postMin, autoHours, autoOpCost, hours, operatingCost,
             toolingCost, suppliesCost, otherCost, totalProductionCost, costPerUnit,
             rawSales, unitPrice, isOverride, isMinPriceApplied, salesRevenue, subtotal, commissionCost, profit,
-            vatAmount, netTotal, marginPercent, markupPercent
+            vatAmount, netTotal, marginPercent, markupPercent, hasActual, actualCost, actualProfit, actualMargin, actualMarkup
         };
     }
 
@@ -3250,6 +3284,17 @@
         $('r_resProfitMargin').innerText = d.marginPercent.toFixed(2) + " %";
         applyMarginGuard($('r_resProfitMargin'), d.marginPercent, d.salesRevenue > 0 && p.qty > 0, $('r_marginGuardNote'));
         $('r_resProfitMarkup').innerText = d.markupPercent.toFixed(2) + " %";
+        const actRows = $('r_actualRows');
+        if (actRows) {
+            actRows.style.display = d.hasActual ? '' : 'none';
+            if (d.hasActual) {
+                const diff = d.actualProfit - d.profit;
+                $('r_resActualCost').innerText = fmtB(d.actualCost) + ' บาท';
+                $('r_resActualProfit').innerText = fmtB(d.actualProfit) + ` บาท (${diff >= 0 ? '+' : ''}${fmtB(diff)} จากที่ประเมิน)`;
+                $('r_resActualMargin').innerText = d.actualMargin.toFixed(2) + ' %' + ` (ประเมิน ${d.marginPercent.toFixed(2)}%)`;
+                $('r_resActualMarkup').innerText = d.actualMarkup.toFixed(2) + ' %' + ` (ประเมิน ${d.markupPercent.toFixed(2)}%)`;
+            }
+        }
 
         drawRollCanvas(p.webWidth, 400, marginX, d.across, p.w || 50, p.h || 50, p.gapX, p.gapY, p.shape, p.radius, currentMachine.name);
         updateTierTable('roll');
@@ -3266,6 +3311,7 @@
             plateInput: p.plateInput, isRepeatOrder: p.isRepeatOrder, blockType: p.blockType,
             hourlyRate: p.hourlyRate, laborRate: p.laborRate, hoursLocked: p.locks.hours, inkLocked: p.locks.ink, plateLocked: p.locks.plate,
             shipping: p.shipping, vat: p.vat, minPrice: p.minPrice, commissionPct: p.commissionPct, fileFee: p.fileFee,
+            actualBlock: p.actualBlock, actualPlate: p.actualPlate,
             deliveryType: p.deliveryType, labelsPerRoll: p.labelsPerRoll, corePrice: p.corePrice, rollsPerBox: p.rollsPerBox, boxPrice: p.boxPrice,
             webWidth: p.webWidth, colors: p.colors, whiteInk: p.whiteInk, coverage: p.coverage, runWastePct: p.runWastePct,
             setupWaste: p.waste, rowsPerRepeat: p.rowsPerRepeat, cylRepeat: p.cylRepeat, twoPass: p.twoPass,
@@ -3328,6 +3374,11 @@
         const unitTxt = p.speedUnit === 'mpm' ? 'ม./นาที' : (p.speedUnit === 'imp' ? 'ครั้ง/นาที' : 'แถว/นาที');
         set('grpSum_mach', `${d.speed} ${unitTxt} · ตั้ง ${p.setupMin} นาที · ${p.hourlyRate} บ./ชม.`);
         set('grpSum_more', `คอม ${p.commissionPct}% · ปัด ${p.roundDec} ตำแหน่ง`);
+        set('grpSum_actual', d.hasActual ? `✔ กำไรจริง ${fmtB(d.actualProfit, 0)} บ. (${d.actualMargin.toFixed(1)}%)` : 'ยังไม่ได้ใส่');
+        const actGrp = document.getElementById('grp_actual');
+        if (actGrp && d.hasActual && !actGrp.dataset.autoOpened) { actGrp.open = true; actGrp.dataset.autoOpened = '1'; }
+        const ah = document.getElementById('r_actualHint');
+        if (ah && d.hasActual) ah.innerHTML = `ประเมินไว้: บล็อก ${fmtB(d.plateCost)} · เพลท ${fmtB(d.dieCost)} บาท → ต้นทุนจริงต่างไป ${fmtB(d.totalProductionCost - d.actualCost)} บาท · กำไรจริง <b>${fmtB(d.actualProfit)} บาท (Margin ${d.actualMargin.toFixed(2)}% · Markup ${d.actualMarkup.toFixed(2)}%)</b>`;
         const finGrp = document.getElementById('grp_fin');
         if (finGrp && fin.length && !finGrp.dataset.autoOpened) { finGrp.open = true; finGrp.dataset.autoOpened = '1'; }
     }
@@ -3707,6 +3758,7 @@
 
             addHeader('3. สรุปราคาขายเสนอลูกค้า (Selling Price Summary)');
             addRow('กำไรที่ตั้งไว้ (Profit):', `${(b.profit || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท (Margin ${(b.marginPercent || 0).toFixed(2)}% | Markup ${(b.markupPercent || 0).toFixed(2)}%)` + (b.isMinPriceApplied ? ` <span style="color:#dc2626;">*คิดราคาขั้นต่ำ ${(b.minPrice||0).toLocaleString('th-TH')} บาท</span>` : ''));
+            if (b.hasActual) addRow('🧾 ต้นทุนจริงจากบิล:', `ต้นทุนรวมจริง ${fmtB(b.actualCost)} บาท` + (b.actualBlock !== null ? ` (บล็อกจริง ${fmtB(b.actualBlock)})` : '') + (b.actualPlate !== null ? ` (เพลทจริง ${fmtB(b.actualPlate)})` : '') + ` → <b>กำไรจริง ${fmtB(b.actualProfit)} บาท (Margin ${b.actualMargin.toFixed(2)}% · Markup ${b.actualMarkup.toFixed(2)}%)</b>`);
             if ((b.commissionPct || 0) > 0) addRow('ค่าคอมเซลส์/นายหน้า:', `${fmtB(b.commissionCost || 0)} บาท (${b.commissionPct}% ของยอดขาย — หักออกจากกำไรแล้ว)`);
             addRow('ค่าจัดส่ง (Shipping):', (b.shipping || 0) > 0 ? `${b.shipping.toLocaleString('th-TH', {minimumFractionDigits:2})} บาท` : 'ไม่มี');
             addRow('ยอดขายก่อนภาษี (Subtotal):', `${(b.subtotal || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท`);
@@ -4291,6 +4343,8 @@
             jobData.totalPrice = document.getElementById('r_resNetTotal').innerText;
             jobData.unitPrice = document.getElementById('r_resUnitPrice').innerText;
             jobData.profit = document.getElementById('r_resProfit').innerText;
+            const ab = window.rollCostBreakdown || {};
+            if (ab.hasActual) jobData.actualProfit = fmtB(ab.actualProfit) + ` บาท (${ab.actualMargin.toFixed(1)}%)`;
 
             jobData.params = {
                 customerName: document.getElementById('r_customerName').value,
@@ -4352,6 +4406,9 @@
                 cylRepeat: document.getElementById('r_cylRepeat').value,
                 cylTeeth: document.getElementById('r_cylTeeth').value,
                 inkMetersOverride: document.getElementById('r_inkMetersOverride').value,
+                actualBlock: document.getElementById('r_actualBlock').value,
+                actualProfitText: (window.rollCostBreakdown && window.rollCostBreakdown.hasActual) ? (fmtB(window.rollCostBreakdown.actualProfit) + ` บาท (${window.rollCostBreakdown.actualMargin.toFixed(1)}%)`) : '',
+                actualPlate: document.getElementById('r_actualPlate').value,
                 rowsLock: document.getElementById('r_rowsLock').checked,
                 rollsPerBox: document.getElementById('r_rollsPerBox').value,
                 boxPrice: document.getElementById('r_boxPrice').value,
@@ -4543,7 +4600,7 @@
                 <td>${item.size}</td>
                 <td>${item.qty}</td>
                 <td style="color:#15803d; font-weight:bold;">${fmtHistMoney(item.totalPrice)}</td>
-                <td style="color:#0369a1; font-weight:bold;">${item.profit || '-'}</td>
+                <td style="color:#0369a1; font-weight:bold;">${item.profit || '-'}${(item.actualProfit || (item.params && item.params.actualProfitText)) ? `<div class="hist-note" style="color:#047857;">🧾 จริง ${item.actualProfit || item.params.actualProfitText}</div>` : ''}</td>
                 <td>
                     <select class="hist-status-select ${selClass}" onchange="updateHistoryStatus(${index}, this.value)">
                         ${optionsHtml}
@@ -4725,6 +4782,7 @@
                 setV('r_cylTeeth', p.cylTeeth, (parseFloat(p.cylRepeat) > 0 ? String(Math.round(parseFloat(p.cylRepeat) / GEAR_PITCH_MM)) : ''));
                 setV('r_cylRepeat', p.cylRepeat, '');
                 setV('r_inkMetersOverride', p.inkMetersOverride, '');
+                setV('r_actualBlock', p.actualBlock, ''); setV('r_actualPlate', p.actualPlate, '');
                 setV('r_rollsPerBox', p.rollsPerBox, '20'); setV('r_boxPrice', p.boxPrice, '0'); setV('r_sheetPackCost', p.sheetPackCost, '0');
                 setV('r_foilPerM', p.foilPerM, '0');
                 setV('r_speed', p.speed, document.getElementById('r_speed').value); setV('r_speedUnit', p.speedUnit, document.getElementById('r_speedUnit').value);
@@ -4740,6 +4798,7 @@
                 calcPcPlateCost();
             } else {
                 // งานเก่า: ล็อกชั่วโมง/หมึก/เพลท ตามที่เคยคีย์ ไม่เผื่อเสียเพิ่ม ไม่ปัดราคา → ราคาเท่าเดิม (ดูค่าที่ระบบแนะนำได้ใต้ช่อง)
+                setV('r_actualBlock', '', ''); setV('r_actualPlate', '', '');
                 setV('r_runWaste', '0', '0'); setV('r_cylRepeat', '', ''); setV('r_cylTeeth', '', ''); setC('r_rowsLock', false); setV('r_boxPrice', '0', '0'); setV('r_sheetPackCost', '0', '0');
                 setV('r_fileFee', '0', '0'); setV('r_foilPerM', '0', '0'); setV('r_commission', '0', '0');
                 setV('r_laborRate', p.hourlyRate, String(STD_RATE_DEFAULT));
