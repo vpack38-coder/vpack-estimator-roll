@@ -290,7 +290,7 @@
         /* ตารางเทียบช่วงราคาแบบหลายสเต็ป (ฉบับเต็มทุกคอลัมน์) — ใช้ในใบสรุปต้นทุนและราคาขาย (Cost Summary) */
         .cs-tier-box-title { font-size: 12.5px; font-weight: bold; color: #0f172a; margin: 2px 0 5px; }
         table.cs-tier-price-table { width: 100%; border-collapse: collapse; }
-        table.cs-tier-price-table th, table.cs-tier-price-table td { border: 1px solid #cbd5e1; padding: 3px 6px; font-size: 10.5px; text-align: right; }
+        table.cs-tier-price-table th, table.cs-tier-price-table td { border: 1px solid #cbd5e1; padding: 1px 6px; font-size: 10.5px; line-height: 1.3; text-align: right; }
         table.cs-tier-price-table th { background: #0f172a; color: #fff; text-align: center; font-weight: bold; }
         table.cs-tier-price-table td:first-child, table.cs-tier-price-table td:nth-child(2) { text-align: center; }
         table.cs-tier-price-table tr:nth-child(even) td { background: #f8fafc; }
@@ -591,11 +591,18 @@
     <div class="version-badge-row">
         <div class="version-badge-wrap">
             <div class="version-badge-line">
-                <div class="system-version-badge">V-Pack Estimator v2.4.9</div>
+                <div class="system-version-badge">V-Pack Estimator v2.5.6</div>
                 <button type="button" class="version-toggle-btn" id="versionToggleBtn" onclick="toggleVersionNotes()" aria-expanded="false" aria-controls="versionNotes">📜 ดูรายการอัปเดต ▾</button>
             </div>
             <div class="version-notes" id="versionNotes">
                 <ul>
+                    <li><b>v2.5.6</b> — ใบสรุปต้นทุน: แถวบล็อก/เพลทไม่พ่วงราคาตั้งต้นในวงเล็บแล้ว + โชว์ราคาจริงตามบิลในแถวเดียวกัน</li>
+                    <li><b>v2.5.5</b> — ใบสรุปต้นทุน: แถวรวมต้นทุน (แดง) / ยอดรวมสุทธิ (เขียว) / ราคาต่อดวง (เหลือง) เตี้ยลง ตัวเล็กลง</li>
+                    <li><b>v2.5.4</b> — ใบสรุปต้นทุนกะทัดรัดขึ้น: หัวเอกสารเล็กลง ตัวอักษร 12px ระยะบรรทัดชิดขึ้น</li>
+                    <li><b>v2.5.3</b> — ใบสรุปต้นทุน: เน้นสีแถวราคาขายต่อดวง (ไม่รวม VAT)</li>
+                    <li><b>v2.5.2</b> — ตารางกระดาษในใบสรุปต้นทุนกว้างเต็มแถว ไม่ตัดบรรทัด ประหยัดพื้นที่</li>
+                    <li><b>v2.5.1</b> — ใบสรุปต้นทุน: แยกกระดาษ ใช้จริง / เผื่อเสียระหว่างวิ่ง / เผื่อตั้งเครื่อง / รวม (เมตร · ตร.ม. · บาท)</li>
+                    <li><b>v2.5.0</b> — ประเมินราคาบล็อกไดคัทจากบิลจริงในประวัติ ตามขนาดงาน (บล็อกไม้ = ความยาวมีด, Flexible Die = พื้นที่บล็อก) พร้อมงานใกล้เคียงและปุ่ม "ใช้ราคานี้"</li>
                     <li><b>v2.4.9</b> — ต้นทุนจริงจากบิล: เพิ่ม % Markup จริง และโชว์ค่าที่ประเมินไว้เทียบ</li>
                     <li><b>v2.4.8</b> — เพิ่ม "🧾 ต้นทุนจริงจากบิล" (บล็อก/เพลท) คำนวณกำไรจริงโดยไม่เปลี่ยนราคาที่เสนอ + แสดงในใบสรุปต้นทุนและตารางประวัติ</li>
                     <li><b>v2.4.7</b> — เปลี่ยนชื่อปุ่มเป็น "ล้างประวัติในเครื่องนี้ (Sheet ไม่หาย)" ให้ชัดว่าไม่ได้ลบข้อมูลใน Google Sheets</li>
@@ -931,6 +938,7 @@
             <label>ค่าบล็อกไดคัท (บาท)</label>
             <input type="number" id="r_plateCost" value="1000" oninput="calcRoll()">
         </div>
+        <div class="calc-hint" id="r_blockEstHint"></div>
         <div class="repeat-order-box" style="padding:9px 10px;">
             <div class="checkbox-left" style="margin-bottom:5px;"><input type="checkbox" id="r_repeatOrder" onchange="calcRoll()"><label for="r_repeatOrder">🔁 พิมพ์ซ้ำงานเดิม</label></div>
             <div class="repeat-order-note">ติ๊กเมื่อใช้บล็อกไดคัทเดิมที่มีอยู่แล้ว → ระบบจะ <b>ไม่คิดค่าบล็อกไดคัท</b> (ค่าเพลทพิมพ์ยังคิดตามปกติ เพราะเพลทอาจต้องเปลี่ยน)</div>
@@ -1466,22 +1474,22 @@
 
 <!-- 3. โครงสร้างสำหรับพิมพ์ ใบสรุปต้นทุนและราคาขาย (Cost & Price Summary) -->
 <div id="costSummaryPrintArea" class="print-area-wrapper">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0f172a; padding-bottom:10px; margin-bottom:10px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:10px; border-bottom:2px solid #0f172a; padding-bottom:4px; margin-bottom:6px;">
         <div>
-            <h2 style="margin:0; color:#0f172a; font-size:18px;">ใบสรุปต้นทุนและราคาขาย (Cost &amp; Price Summary)</h2>
-            <div style="font-size:13px; color:#475569; margin-top:4px;">บริษัท วี แพค การพิมพ์และบรรจุภัณฑ์ จำกัด (V-Pack Estimator) — เอกสารใช้ภายในเท่านั้น ไม่ใช้ส่งลูกค้า</div>
+            <h2 style="margin:0; color:#0f172a; font-size:15px; line-height:1.25;">ใบสรุปต้นทุนและราคาขาย <span style="font-size:12px; font-weight:normal; color:#64748b;">(Cost &amp; Price Summary)</span></h2>
+            <div style="font-size:10.5px; color:#64748b; margin-top:1px;">บริษัท วี แพค การพิมพ์และบรรจุภัณฑ์ จำกัด — 🔒 เอกสารใช้ภายในเท่านั้น ไม่ใช้ส่งลูกค้า</div>
         </div>
-        <div style="text-align:right;">
-            <div style="font-size:14px; font-weight:bold;" id="cs_jobTypeBadge">ประเภทงาน: -</div>
-            <div style="font-size:12px; color:#64748b; margin-top:4px;" id="cs_printDate">วันที่ออกเอกสาร: -</div>
+        <div style="text-align:right; white-space:nowrap;">
+            <div style="font-size:12px; font-weight:bold;" id="cs_jobTypeBadge">ประเภทงาน: -</div>
+            <div style="font-size:10.5px; color:#64748b; margin-top:1px;" id="cs_printDate">วันที่ออกเอกสาร: -</div>
         </div>
     </div>
 
-    <table style="width:100%; border-collapse: collapse; font-size: 13px;">
+    <table style="width:100%; border-collapse: collapse; font-size: 12px; line-height:1.3;">
         <tbody id="cs_content"></tbody>
     </table>
 
-    <div style="margin-top: 20px; font-size: 12px; color: #64748b; text-align: center;">
+    <div style="margin-top: 8px; font-size: 10.5px; color: #64748b; text-align: center;">
         * เอกสารนี้สร้างจากระบบ V-Pack Estimator แสดงรายละเอียดต้นทุนแยกรายการทั้งหมด สำหรับใช้ตรวจสอบ/รายงานภายในบริษัทเท่านั้น *
     </div>
 
@@ -2824,6 +2832,8 @@
         const pitchDefault = p.h + p.gapY;
         const pitch = p.cylRepeat > 0 ? p.cylRepeat / p.rowsPerRepeat : pitchDefault;
         const realMeters = rows * pitch / 1000;
+        const netRows = qty > 0 ? Math.ceil(qty / across) : 0;
+        const netMeters = netRows * pitch / 1000;   // ตามจำนวนสั่งพอดี (ไม่รวมเผื่อเสีย)
         const pass2Spec = machineSpecs.bsp3231;
         const pass2Waste = p.twoPass ? pass2Spec.setupWaste : 0;
         const totalMeters = realMeters + p.waste + pass2Waste;
@@ -2924,7 +2934,7 @@
         const markupPercent = totalProductionCost > 0 ? (profit / totalProductionCost) * 100 : 0;
 
         return {
-            qty, across, produceQty, rows, pitch, pitchDefault, realMeters, totalMeters, totalSqm, pass2Waste,
+            qty, across, produceQty, rows, netMeters, pitch, pitchDefault, realMeters, totalMeters, totalSqm, pass2Waste,
             matCost, coreCostTotal, totalMatAndCore, finishedRollCount, boxCount, packCost,
             lamWidth, lamSqm, laminateCost, uvCost, foilCost, foilMeters, deadeningCost,
             inkAuto, inkCost, inkWidthFactor, inkBaseMeters, plateAuto, dieCost, plateCost,
@@ -3300,6 +3310,7 @@
         updateTierTable('roll');
         renderPreChecklist(p, d);
         updateGroupSummaries(p, d);
+        renderBlockEstimate(p, d);
         if (typeof renderPcBreakdowns === 'function') renderPcBreakdowns(p, d);
 
         // เก็บรายละเอียดต้นทุนแยกรายการไว้ใช้สร้าง "ใบสรุปต้นทุนและราคาขาย" / แถบสรุป / Job Ticket
@@ -3381,6 +3392,98 @@
         if (ah && d.hasActual) ah.innerHTML = `ประเมินไว้: บล็อก ${fmtB(d.plateCost)} · เพลท ${fmtB(d.dieCost)} บาท → ต้นทุนจริงต่างไป ${fmtB(d.totalProductionCost - d.actualCost)} บาท · กำไรจริง <b>${fmtB(d.actualProfit)} บาท (Margin ${d.actualMargin.toFixed(2)}% · Markup ${d.actualMarkup.toFixed(2)}%)</b>`;
         const finGrp = document.getElementById('grp_fin');
         if (finGrp && fin.length && !finGrp.dataset.autoOpened) { finGrp.open = true; finGrp.dataset.autoOpened = '1'; }
+    }
+
+
+    // ===== v2.5.0: ประเมินราคาบล็อกไดคัทจากบิลจริงในประวัติ (Parametric Estimating) =====
+    // บล็อกไม้: ราคาแปรตาม "ความยาวมีดรวม" (เส้นรอบดวง × จำนวนดวงบนบล็อก)
+    // Flexible Die: ราคาแปรตาม "พื้นที่แผ่นบล็อก"
+    // มีบิล ≥ 3 งานและขนาดหลากหลาย → เส้นตรง ราคา = a + b × ขนาด / น้อยกว่านั้น → ราคาเฉลี่ยต่อหน่วยขนาด
+    function labelPerimeterMM(shape, w, h, radius) {
+        if (shape === 'circle') return Math.PI * w;
+        if (shape === 'oval') { const a = w / 2, b = h / 2; return Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b))); }
+        const r = Math.max(0, Math.min(radius || 0, w / 2, h / 2));
+        return 2 * (w + h) - (8 - 2 * Math.PI) * r;   // สี่เหลี่ยม (มุมมน) / โดม / ดอกไม้ ประมาณเป็นสี่เหลี่ยม
+    }
+    function blockMetric(type, d) {
+        if (!(d.w > 0 && d.h > 0 && d.across > 0 && d.rows > 0)) return null;
+        if (type === 'wood') {
+            return { value: labelPerimeterMM(d.shape, d.w, d.h, d.radius) * d.across * d.rows / 10, unit: 'ซม. มีด' };
+        }
+        const dieW = d.across * d.w + (d.across - 1) * d.gapX;
+        const dieH = d.rows * d.h + (d.rows - 1) * d.gapY;
+        return { value: dieW * dieH / 100, unit: 'ตร.ซม.' };
+    }
+    function blockDimsFromParams(pr) {
+        const w = parseFloat(pr.w) || 0, h = parseFloat(pr.h) || 0;
+        const gapX = parseFloat(pr.gapX) || 0, gapY = parseFloat(pr.gapY) || 0, web = parseFloat(pr.webWidth) || 0;
+        let across = pr.layoutMode === 'custom' ? (parseInt(pr.customAcross) || 1) : (w > 0 ? Math.max(1, Math.floor((web - 10 + gapX) / (w + gapX))) : 1);
+        let rows = parseInt(pr.rowsPerRepeat) || 0;
+        if (!rows) rows = autoRowsPerRepeat(h, gapY, 0);
+        return { w, h, gapX, gapY, across, rows, shape: pr.shape || 'rect', radius: parseFloat(pr.radius) || 0 };
+    }
+    function blockTypeOfParams(pr) {
+        if (pr.plateType && BLOCK_PRICES[pr.plateType] !== undefined) return pr.plateType;
+        return parseFloat(pr.plateCost) >= 5000 ? 'flex_old' : 'wood';
+    }
+    function estimateBlockFromHistory(type, cur) {
+        let hist = [];
+        try { hist = JSON.parse(localStorage.getItem('vpack_estimator_history_roll') || '[]'); } catch (e) {}
+        const pts = [];
+        const seen = {};
+        hist.forEach(item => {
+            const pr = item.params || {};
+            const price = parseFloat(pr.actualBlock);
+            if (item.tab === 'sheet' || !(price > 0) || blockTypeOfParams(pr) !== type) return;
+            const m = blockMetric(type, blockDimsFromParams(pr));
+            if (!m || !(m.value > 0)) return;
+            const key = item.id || (item.name + m.value);
+            if (seen[key]) return; seen[key] = 1;
+            pts.push({ x: m.value, y: price, name: item.name || '-', size: item.size || '' });
+        });
+        const curM = blockMetric(type, cur);
+        if (!pts.length || !curM) return { n: pts.length, unit: curM ? curM.unit : '' };
+        const n = pts.length;
+        const mx = pts.reduce((a, p) => a + p.x, 0) / n, my = pts.reduce((a, p) => a + p.y, 0) / n;
+        let est = null, method = '';
+        if (n >= 3) {
+            const sxx = pts.reduce((a, p) => a + (p.x - mx) * (p.x - mx), 0);
+            const sxy = pts.reduce((a, p) => a + (p.x - mx) * (p.y - my), 0);
+            if (sxx > 0 && mx > 0 && Math.sqrt(sxx / n) / mx > 0.1) {   // ขนาดต้องหลากหลายพอ
+                const b = sxy / sxx, a = my - b * mx;
+                const e = a + b * curM.value;
+                if (b > 0 && e > 0) { est = e; method = 'ตามขนาด (เส้นตรงจากบิล)'; }
+            }
+        }
+        if (est === null) {
+            const ratio = pts.reduce((a, p) => a + p.y, 0) / pts.reduce((a, p) => a + p.x, 0);   // บาทต่อหน่วยขนาด
+            est = ratio * curM.value; method = n >= 3 ? 'ราคาเฉลี่ยต่อขนาด' : 'ราคาเฉลี่ยต่อขนาด (บิลยังน้อย)';
+        }
+        // ไม่ให้หลุดช่วงราคาที่เคยเจอเกินไปมาก (กันบิลน้อยแล้วตัวเลขแกว่ง)
+        const minY = Math.min(...pts.map(p => p.y)), maxY = Math.max(...pts.map(p => p.y));
+        est = Math.min(Math.max(est, minY * 0.5), maxY * 2);
+        const near = pts.slice().sort((a, b) => Math.abs(a.x - curM.value) - Math.abs(b.x - curM.value)).slice(0, 2);
+        return { n, est: Math.round(est / 10) * 10, method, unit: curM.unit, cur: curM.value, near, minY, maxY, avg: my };
+    }
+    function renderBlockEstimate(p, d) {
+        const el = document.getElementById('r_blockEstHint');
+        if (!el) return;
+        const type = p.blockType;
+        const r = estimateBlockFromHistory(type, { w: p.w, h: p.h, gapX: p.gapX, gapY: p.gapY, across: d.across, rows: p.rowsPerRepeat, shape: p.shape, radius: p.radius });
+        const typeName = { wood: 'บล็อกไม้', flex_old: 'Flexible Die ระบบเดิม', flex_offset: 'Flexible Die ระบบ Offset' }[type] || type;
+        if (!r.n || r.est === undefined) {
+            el.className = 'calc-hint show';
+            el.innerHTML = `💡 ยังไม่มีบิลจริงของ${typeName}ในประวัติ — ใส่ "ค่าบล็อกไดคัทจริง" ในงานเก่า แล้วระบบจะประเมินราคาตามขนาดให้`;
+            return;
+        }
+        const nearTxt = r.near.map(q => `${q.name}${q.size ? ' (' + q.size + ')' : ''} ${fmtB(q.y, 0)} บ.`).join(' · ');
+        const diff = p.plateInput > 0 ? (p.plateInput - r.est) / r.est * 100 : 0;
+        el.className = 'calc-hint show' + (p.plateInput > 0 && Math.abs(diff) > 25 ? ' warn' : '');
+        el.innerHTML = `💡 ประเมินจากบิลจริง ${r.n} งาน (${r.method}): บล็อกขนาดนี้ (${fmtB(r.cur, 0)} ${r.unit}) ประมาณ <b>${fmtB(r.est, 0)} บาท</b>`
+            + ` · ช่วงบิล ${fmtB(r.minY, 0)}–${fmtB(r.maxY, 0)} บ.`
+            + (nearTxt ? `<br>งานใกล้เคียง: ${nearTxt}` : '')
+            + (p.plateInput > 0 && Math.abs(diff) > 25 ? ` <br>⚠️ ราคาที่ใส่ต่างจากที่ประเมิน ${diff > 0 ? '+' : ''}${diff.toFixed(0)}%` : '')
+            + (Math.abs(p.plateInput - r.est) >= 1 ? `<a onclick="document.getElementById('r_plateCost').value=${r.est}; calcRoll();">ใช้ราคานี้</a>` : ' ✅ ใช้ราคานี้อยู่');
     }
 
     // เช็กลิสต์ก่อนเสนอราคา: ช่องที่เป็น 0 / ค่าที่น่าสงสัย (เตือนเฉยๆ ไม่บล็อก)
@@ -3695,9 +3798,10 @@
             printCS.classList.add('active-print');
             let html = '';
 
-            const addHeader = (title) => { html += `<tr><td colspan="2" style="background:#0f172a; color:white; font-weight:bold; padding:4px 8px; font-size:14px; border:1px solid #0f172a;">${title}</td></tr>`; };
-            const addRow = (label, val) => { html += `<tr><td style="padding:4px 8px; border:1px solid #cbd5e1; font-weight:bold; width:42%; background:#f1f5f9; color:#334155; font-size:13px;">${label}</td><td style="padding:4px 8px; border:1px solid #cbd5e1; color:#0f172a; font-size:13px;">${val}</td></tr>`; };
-            const addRowStrong = (label, val, bg, color) => { html += `<tr><td style="padding:6px 8px; border:1px solid #cbd5e1; font-weight:bold; width:42%; background:${bg}; color:${color}; font-size:13.5px;">${label}</td><td style="padding:6px 8px; border:1px solid #cbd5e1; color:${color}; font-weight:bold; font-size:13.5px; background:${bg};">${val}</td></tr>`; };
+            // v2.5.4: ใบสรุปต้นทุนแบบกะทัดรัด (ตัวเล็กลง ระยะบรรทัดชิดขึ้น)
+            const addHeader = (title) => { html += `<tr><td colspan="2" style="background:#0f172a; color:white; font-weight:bold; padding:2px 7px; font-size:12px; line-height:1.3; border:1px solid #0f172a;">${title}</td></tr>`; };
+            const addRow = (label, val) => { html += `<tr><td style="padding:1px 7px; border:1px solid #cbd5e1; font-weight:bold; width:38%; background:#f1f5f9; color:#334155; font-size:12px; line-height:1.3;">${label}</td><td style="padding:1px 7px; border:1px solid #cbd5e1; color:#0f172a; font-size:12px; line-height:1.3;">${val}</td></tr>`; };
+            const addRowStrong = (label, val, bg, color) => { html += `<tr><td style="padding:2px 7px; border:1px solid #cbd5e1; font-weight:bold; width:38%; background:${bg}; color:${color}; font-size:12px; line-height:1.3;">${label}</td><td style="padding:2px 7px; border:1px solid #cbd5e1; color:${color}; font-weight:bold; font-size:12.5px; line-height:1.3; background:${bg};">${val}</td></tr>`; };
 
             document.getElementById('cs_printDate').innerText = 'วันที่ออกเอกสาร: ' + dateStr + ' ' + now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) + ' | เลขที่อ้างอิง: ' + randomNo;
 
@@ -3723,7 +3827,30 @@
             addRow('ชนิดสติ๊กเกอร์:', `[${matObj.code}] ${matObj.name} (ราคา ${matPrice} บ./ตร.ม.)`);
             addRow('หน้ากว้างม้วนที่ใช้ (Web Width):', `${(b.webWidth || document.getElementById('r_webWidth').value)} มม.`);
             addRow('รูปทรง และ ขนาดชิ้นงาน:', `${shapeName} | ${size}`);
-            addRow('รวมพื้นที่กระดาษที่ใช้:', `${(b.totalMeters || 0).toFixed(2)} เมตร (${(b.totalSqm || 0).toFixed(2)} ตร.ม.)`);
+            {
+                // v2.5.2: แยกกระดาษ ใช้จริง / เผื่อเสีย / เผื่อตั้งเครื่อง / รวม — แถวนี้กว้างเต็ม 2 ช่อง ให้อยู่บรรทัดเดียว
+                const webM = (b.webWidth || 0) / 1000, mp = parseFloat(matPrice) || 0;
+                const netM = b.netMeters || 0;
+                const runM = Math.max(0, (b.realMeters || 0) - netM);
+                const setupM = b.setupWaste || 0, pass2M = b.pass2Waste || 0;
+                const totM = b.totalMeters || 0;
+                const wastePct = totM > 0 ? (totM - netM) / totM * 100 : 0;
+                const td = 'padding:1px 6px; border:1px solid #cbd5e1; white-space:nowrap; font-size:12px; line-height:1.3;';
+                const num = td + ' text-align:right;';
+                const lines = [
+                    ['✅ ใช้จริง', netM, `${fmtB(b.qty || 0, 0)} ดวง`],
+                    ['➕ เผื่อเสียระหว่างวิ่ง', runM, `${b.runWastePct || 0}% = ${fmtB((b.produceQty || 0) - (b.qty || 0), 0)} ดวง`],
+                    ['➕ เผื่อตั้งเครื่อง', setupM, 'Setup Waste']
+                ];
+                if (pass2M > 0) lines.push(['➕ ตั้งเครื่องไดคัท', pass2M, 'BSP 3231 รอบสอง']);
+                let inner = '';
+                lines.forEach((l, i) => {
+                    inner += `<tr>` + (i === 0 ? `<td rowspan="${lines.length + 1}" style="padding:1px 7px; border:1px solid #cbd5e1; font-weight:bold; background:#f1f5f9; color:#334155; font-size:12px; line-height:1.3; width:18%; vertical-align:middle;">กระดาษที่ใช้<br><span style="font-weight:normal; font-size:11px;">หน้า ${b.webWidth || '-'} มม.</span></td>` : '')
+                        + `<td style="${td}">${l[0]}</td><td style="${num}">${fmtB(l[1], 2)} ม.</td><td style="${num}">${fmtB(l[1] * webM, 2)} ตร.ม.</td><td style="${num}">${fmtB(l[1] * webM * mp, 2)} บาท</td><td style="${td} color:#64748b; font-size:11px;">${l[2]}</td></tr>`;
+                });
+                inner += `<tr style="font-weight:bold; background:#f8fafc;"><td style="${td}">รวมทั้งหมด</td><td style="${num}">${fmtB(totM, 2)} ม.</td><td style="${num}">${fmtB(b.totalSqm || 0, 2)} ตร.ม.</td><td style="${num}">${fmtB(b.matCost || 0, 2)} บาท</td><td style="${td} color:#b45309; font-size:11px;">เผื่อ ${wastePct.toFixed(1)}% ของทั้งหมด</td></tr>`;
+                html += `<tr><td colspan="2" style="padding:0; border:1px solid #cbd5e1;"><table style="width:100%; border-collapse:collapse;">${inner}</table></td></tr>`;
+            }
 
             addHeader('2. รายละเอียดต้นทุนวัตถุดิบและการผลิต (Cost Breakdown แยกทุกรายการ)');
             addRow('💧 ต้นทุนกระดาษ/สติ๊กเกอร์ (Paper Cost):', `<b>${(b.matCost || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท</b> (${(b.totalSqm || 0).toFixed(2)} ตร.ม. x ${matPrice} บ./ตร.ม.)`);
@@ -3743,18 +3870,20 @@
                   )
                 : 'ไม่มี');
             // v2.4.0: แก้ป้ายที่เคยสลับกัน — plateCost (id r_plateCost) = บล็อกไดคัท / dieCost (id r_dieCost) = เพลทพิมพ์+ฟิล์ม
-            const blockTxt = (document.getElementById('r_plateType').options[document.getElementById('r_plateType').selectedIndex] || {}).text || '';
+            // v2.5.6: ชื่อชนิดบล็อกไม่พ่วงราคาตั้งต้น (กันเข้าใจผิดว่าราคาไม่เปลี่ยน) + โชว์ราคาจริงจากบิลในแถวเดียวกัน
+            const blockTxt = ({ wood: 'บล็อกไม้', flex_old: 'Flexible Die ระบบเดิม', flex_offset: 'Flexible Die ระบบ Offset' })[b.blockType] || '';
+            const actualTag = (v, est) => (v !== null && v !== undefined) ? ` → <b style="color:#047857;">จริงตามบิล ${fmtB(v)} บาท</b> (${v - est >= 0 ? '+' : ''}${fmtB(v - est)})` : '';
             addRow('✂️ ค่าบล็อกไดคัท (Die-cut Block):', b.isRepeatOrder
                 ? `0.00 บาท (พิมพ์ซ้ำงานเดิม — ใช้บล็อกเดิม ราคา ${fmtB(b.plateInput || 0)} บาท ไม่คิดซ้ำ)`
-                : `${fmtB(b.plateCost || 0)} บาท (${blockTxt})`);
-            addRow('🖼️ ค่าเพลทพิมพ์+ฟิล์ม (Print Plate):', `${fmtB(b.dieCost || 0)} บาท` + (b.plateLocked ? ' (คีย์เอง)' : ` (อัตโนมัติ ${b.plateAuto ? b.plateAuto.plates : 0} เพลท)`));
+                : `${fmtB(b.plateCost || 0)} บาท (${blockTxt}${b.actualBlock !== null && b.actualBlock !== undefined ? ' · ราคาที่ประเมิน' : ''})` + actualTag(b.actualBlock, b.plateCost || 0));
+            addRow('🖼️ ค่าเพลทพิมพ์+ฟิล์ม (Print Plate):', `${fmtB(b.dieCost || 0)} บาท` + (b.plateLocked ? ' (คีย์เอง)' : ` (อัตโนมัติ ${b.plateAuto ? b.plateAuto.plates : 0} เพลท)`) + actualTag(b.actualPlate, b.dieCost || 0));
             addRow('🎨 ค่าสีพิมพ์ (Ink):', `${fmtB(b.inkCost || 0)} บาท` + (b.inkLocked ? ' (คีย์เอง)' : ` (อัตโนมัติ ${b.colors || 0} สี${b.whiteInk ? '+รองขาว' : ''} × ${fmtB(b.totalMeters || 0, 0)} ม.)`));
             addRow('⏱️ ค่าเครื่องจักร + แรงงาน:', b.hoursLocked
                 ? `${fmtB(b.operatingCost || 0)} บาท (คีย์เอง ${(b.hours || 0).toFixed(2)} ชม. x ${fmtB(b.hourlyRate || 0, 0)} บ./ชม.)`
                 : `${fmtB(b.operatingCost || 0)} บาท (เครื่อง ${((b.machineMin || 0) / 60).toFixed(2)} ชม. x ${fmtB(b.hourlyRate || 0, 0)}` + ((b.pass2Min || 0) > 0 ? ` + ไดคัท BSP ${((b.pass2Min) / 60).toFixed(2)} ชม.` : '') + ` + หลังพิมพ์ ${((b.postMin || 0) / 60).toFixed(2)} ชม. x ${fmtB(b.laborRate || 0, 0)})`);
             addRow('📦 ค่าบรรจุภัณฑ์:', (b.packCost || 0) > 0 ? `${fmtB(b.packCost)} บาท` + (b.deliveryType === 'roll' ? ` (${b.boxCount || 0} กล่อง x ${fmtB(b.boxPrice || 0)} บ.)` : '') : 'ไม่ได้คิด');
             if ((b.fileFee || 0) > 0) addRow('🖥️ ค่าอาร์ตเวิร์ก/Proof:', `${fmtB(b.fileFee)} บาท`);
-            addRowStrong('รวมต้นทุนการผลิตทั้งหมด (Total Production Cost):', `${(b.totalProductionCost || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท  (ตกดวงละ ${(b.costPerUnit || 0).toFixed(4)} บาท/ดวง)`, '#fef2f2', '#991b1b');
+            addRowStrong('รวมต้นทุนการผลิตทั้งหมด (Total Cost):', `${(b.totalProductionCost || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท  (ตกดวงละ ${(b.costPerUnit || 0).toFixed(4)} บาท/ดวง)`, '#fef2f2', '#991b1b');
 
             addHeader('3. สรุปราคาขายเสนอลูกค้า (Selling Price Summary)');
             addRow('กำไรที่ตั้งไว้ (Profit):', `${(b.profit || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท (Margin ${(b.marginPercent || 0).toFixed(2)}% | Markup ${(b.markupPercent || 0).toFixed(2)}%)` + (b.isMinPriceApplied ? ` <span style="color:#dc2626;">*คิดราคาขั้นต่ำ ${(b.minPrice||0).toLocaleString('th-TH')} บาท</span>` : ''));
@@ -3764,7 +3893,8 @@
             addRow('ยอดขายก่อนภาษี (Subtotal):', `${(b.subtotal || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท`);
             addRow(`ภาษีมูลค่าเพิ่ม (VAT ${(b.vat === undefined || b.vat === null) ? 7 : b.vat}%):`, `${(b.vatAmount || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท`);
             addRowStrong('ยอดขายรวมสุทธิ (Grand Total):', `${(b.netTotal || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท`, '#f0fdf4', '#15803d');
-            addRow('ราคาขายต่อดวง (ไม่รวม VAT):', `<b>${(b.unitPrice || 0).toFixed(4)} บาท/ดวง</b>`);
+            // v2.5.3: เน้นสีราคาขายต่อดวง
+            html += `<tr><td style="padding:2px 7px; border:2px solid #f59e0b; font-weight:bold; background:#fef3c7; color:#92400e; font-size:12px; line-height:1.3;">🏷️ ราคาขายต่อดวง (ไม่รวม VAT):</td><td style="padding:2px 7px; border:2px solid #f59e0b; background:#fffbeb; color:#b45309; font-size:13.5px; line-height:1.3; font-weight:bold;">${(b.unitPrice || 0).toFixed(4)} บาท/ดวง</td></tr>`;
 
             const csIncludeTierEl = document.getElementById('r_includeTierInQuote');
             const csTierRows = lastTierRows['roll'] || [];
