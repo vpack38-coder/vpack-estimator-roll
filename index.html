@@ -566,6 +566,11 @@
         .sec-body.collapsed { display:none; }
         .grp-toolbar { display:flex; justify-content:flex-end; gap:6px; margin:2px 0 -4px; }
         .grp-toolbar button { font-size:0.7rem; padding:1px 8px; border:1px solid #cbd5e1; background:#fff; border-radius:4px; cursor:pointer; color:#475569; font-family:inherit; }
+        table.history-table th.hist-sort { cursor:pointer; user-select:none; }
+        table.history-table th.hist-sort:hover { background:#e2e8f0; }
+        table.history-table th.hist-sort.sorted { background:#dbeafe; color:#1e40af; }
+        table.history-table .sort-ind { font-size:0.65rem; margin-left:3px; color:#94a3b8; }
+        table.history-table th.sorted .sort-ind { color:#1e40af; }
         .pc-breakdown { font-size:0.85rem; line-height:1.7; color:#334155; }
     </style>
 </head>
@@ -586,11 +591,13 @@
     <div class="version-badge-row">
         <div class="version-badge-wrap">
             <div class="version-badge-line">
-                <div class="system-version-badge">V-Pack Estimator v2.4.5</div>
+                <div class="system-version-badge">V-Pack Estimator v2.4.7</div>
                 <button type="button" class="version-toggle-btn" id="versionToggleBtn" onclick="toggleVersionNotes()" aria-expanded="false" aria-controls="versionNotes">📜 ดูรายการอัปเดต ▾</button>
             </div>
             <div class="version-notes" id="versionNotes">
                 <ul>
+                    <li><b>v2.4.7</b> — เปลี่ยนชื่อปุ่มเป็น "ล้างประวัติในเครื่องนี้ (Sheet ไม่หาย)" ให้ชัดว่าไม่ได้ลบข้อมูลใน Google Sheets</li>
+                    <li><b>v2.4.6</b> — ตารางประวัติ: คลิกหัวคอลัมน์เพื่อเรียง (วันที่ ประเภท ชื่องาน รหัสกระดาษ ขนาด จำนวน ยอดสุทธิ กำไร สถานะ) คลิกซ้ำ = กลับลำดับ</li>
                     <li><b>v2.4.5</b> — หน้าต่างหมึก: พิมพ์ความยาว (เมตร) เองได้ · หน้าต่างเวลา: พิมพ์จำนวนดวง/ดวงต่อแถวได้</li>
                     <li><b>v2.4.4</b> — หมึกกลับมาคิดเป็น บาท/เมตร/สี แบบเดิม (ระบบปรับตามหน้ากว้างเทียบ 110 มม. ให้เอง)</li>
                     <li><b>v2.4.3</b> — ย่อ/ขยายได้ทุกหัวข้อ (คลิกแถบสี) + กลุ่มช่องที่ระบบเติมให้ถูกย่อไว้ พร้อมสรุปค่าบนหัวกลุ่ม · ปุ่มย่อ/ขยายทั้งหมด · จำสถานะไว้ในเครื่อง</li>
@@ -1184,21 +1191,21 @@
             <div class="history-actions">
                 <button class="btn-hist-action" style="background:#0284c7; color:#fff;" onclick="pullFromSheet()">🔄 ซิงค์ประวัติจาก Google Sheets</button>
                 <button class="btn-hist-action btn-export-csv" onclick="exportHistoryCSV()">📥 ส่งออกไฟล์ Excel (CSV)</button>
-                <button class="btn-hist-action btn-clear-hist" onclick="clearAllHistory()">🧹 ล้างประวัติทั้งหมด</button>
+                <button class="btn-hist-action btn-clear-hist" onclick="clearAllHistory()" title="ลบเฉพาะสำเนาในเบราว์เซอร์เครื่องนี้ ข้อมูลใน Google Sheets ยังอยู่ครบ">🧹 ล้างประวัติในเครื่องนี้ (Sheet ไม่หาย)</button>
             </div>
         </div>
         <table class="history-table">
             <thead>
-                <tr>
-                    <th>วันที่/เวลา</th>
-                    <th>ประเภท</th>
-                    <th>ชื่องาน / ลูกค้า</th>
-                    <th>รหัสกระดาษ</th>
-                    <th>ขนาดชิ้นงาน</th>
-                    <th>จำนวนสั่ง</th>
-                    <th>ยอดสุทธิ</th>
-                    <th>กำไร</th>
-                    <th>สถานะเอกสาร</th>
+                <tr id="historyHeadRow">
+                    <th class="hist-sort" data-sort="time" onclick="setHistorySort('time')">วันที่/เวลา<span class="sort-ind"></span></th>
+                    <th class="hist-sort" data-sort="type" onclick="setHistorySort('type')">ประเภท<span class="sort-ind"></span></th>
+                    <th class="hist-sort" data-sort="name" onclick="setHistorySort('name')">ชื่องาน / ลูกค้า<span class="sort-ind"></span></th>
+                    <th class="hist-sort" data-sort="mat" onclick="setHistorySort('mat')">รหัสกระดาษ<span class="sort-ind"></span></th>
+                    <th class="hist-sort" data-sort="size" onclick="setHistorySort('size')">ขนาดชิ้นงาน<span class="sort-ind"></span></th>
+                    <th class="hist-sort" data-sort="qty" onclick="setHistorySort('qty')">จำนวนสั่ง<span class="sort-ind"></span></th>
+                    <th class="hist-sort" data-sort="total" onclick="setHistorySort('total')">ยอดสุทธิ<span class="sort-ind"></span></th>
+                    <th class="hist-sort" data-sort="profit" onclick="setHistorySort('profit')">กำไร<span class="sort-ind"></span></th>
+                    <th class="hist-sort" data-sort="status" onclick="setHistorySort('status')">สถานะเอกสาร<span class="sort-ind"></span></th>
                     <th>จัดการ / โหลดเป็นต้นแบบ</th>
                 </tr>
             </thead>
@@ -4443,6 +4450,52 @@
         return str.slice(0, i).trim() + `<div class="hist-note">${str.slice(i + 1).replace(/[()]/g, '').trim()}</div>`;
     }
 
+    // ===== v2.4.6: คลิกหัวตารางประวัติเพื่อเรียงลำดับ (คลิกซ้ำ = กลับลำดับ) =====
+    let histSort = (function () { try { return JSON.parse(localStorage.getItem('vpack_hist_sort') || 'null') || { key: 'time', dir: 'desc' }; } catch (e) { return { key: 'time', dir: 'desc' }; } })();
+    function setHistorySort(key) {
+        if (histSort.key === key) histSort.dir = histSort.dir === 'asc' ? 'desc' : 'asc';
+        else histSort = { key: key, dir: (key === 'time' || key === 'qty' || key === 'total' || key === 'profit') ? 'desc' : 'asc' };
+        try { localStorage.setItem('vpack_hist_sort', JSON.stringify(histSort)); } catch (e) {}
+        renderHistoryTable();
+    }
+    // แปลงวันที่ในประวัติเป็นตัวเลขสำหรับเรียง (รองรับ "11/11/2569 10:56", แบบ ISO จาก Sheet, และเลขเวลาใน id)
+    function histTimeValue(item) {
+        const str = String(item.time == null ? '' : item.time).trim();
+        let m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+        if (m) {
+            let y = parseInt(m[3]); if (y > 2400) y -= 543;
+            return new Date(y, parseInt(m[2]) - 1, parseInt(m[1]), parseInt(m[4] || 0), parseInt(m[5] || 0)).getTime();
+        }
+        if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+            const d = new Date(str);
+            if (!isNaN(d)) { let t = d.getTime(); if (d.getFullYear() > 2400) t = new Date(d.getFullYear() - 543, d.getMonth(), d.getDate(), d.getHours(), d.getMinutes()).getTime(); return t; }
+        }
+        const idm = String(item.id || '').match(/^J(\d{12,})/);
+        return idm ? parseInt(idm[1]) : 0;
+    }
+    function histNum(v) { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '').replace(/[^0-9.\-]/g, ' ').trim().split(/\s+/)[0]); return Number.isFinite(n) ? n : -Infinity; }
+    function histSortValue(item, key) {
+        switch (key) {
+            case 'time': return histTimeValue(item);
+            case 'type': return String(item.type || '');
+            case 'name': return String(item.name || '');
+            case 'mat': { const m = String(item.matInfo || '').match(/^\[([^\]]+)\]/); return m ? m[1] : String(item.matInfo || ''); }
+            case 'size': { const m = String(item.size || '').match(/([\d.]+)\s*[x×]\s*([\d.]+)/i); return m ? parseFloat(m[1]) * 100000 + parseFloat(m[2]) : -Infinity; }
+            case 'qty': return histNum(item.qty);
+            case 'total': return histNum(item.totalPrice);
+            case 'profit': return histNum(item.profit);
+            case 'status': return ['passed', 'pending', 'requote', '', 'rejected', 'cancelled'].indexOf(item.status || '');
+        }
+        return '';
+    }
+    function updateHistoryHeader() {
+        document.querySelectorAll('#historyHeadRow th.hist-sort').forEach(th => {
+            const on = th.dataset.sort === histSort.key;
+            th.classList.toggle('sorted', on);
+            th.querySelector('.sort-ind').textContent = on ? (histSort.dir === 'asc' ? '▲' : '▼') : '⇅';
+        });
+    }
+
     function renderHistoryTable() {
         let history = JSON.parse(localStorage.getItem('vpack_estimator_history_roll') || '[]');
         const tbody = document.getElementById('historyTableBody');
@@ -4465,9 +4518,19 @@
             { value: 'cancelled', label: '🚫 ยกเลิก' }
         ];
 
+        // เรียงลำดับตามหัวตารางที่เลือก (เก็บ index เดิมไว้ใช้กับปุ่มโหลด/ลบ/สถานะ)
+        updateHistoryHeader();
+        const rows = history.map((item, index) => ({ item, index })).filter(r => r.item.tab !== 'sheet');
+        const dir = histSort.dir === 'asc' ? 1 : -1;
+        rows.sort((a, b) => {
+            const va = histSortValue(a.item, histSort.key), vb = histSortValue(b.item, histSort.key);
+            let c = (typeof va === 'number' && typeof vb === 'number') ? (va - vb) : String(va).localeCompare(String(vb), 'th', { numeric: true });
+            if (c === 0) c = histTimeValue(a.item) - histTimeValue(b.item);
+            return c * dir;
+        });
+
         let html = '';
-        history.forEach((item, index) => {
-            if (item.tab === 'sheet') return; // ข้ามงานแผ่น ไม่แสดงในหน้านี้
+        rows.forEach(({ item, index }) => {
             const status = item.status || '';
             const rowClass = status ? `hist-status-${status}` : '';
             const selClass = status ? `st-${status}` : 'st-none';
