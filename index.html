@@ -591,11 +591,17 @@
     <div class="version-badge-row">
         <div class="version-badge-wrap">
             <div class="version-badge-line">
-                <div class="system-version-badge">V-Pack Estimator v2.5.6</div>
+                <div class="system-version-badge">V-Pack Estimator v2.6.5</div>
                 <button type="button" class="version-toggle-btn" id="versionToggleBtn" onclick="toggleVersionNotes()" aria-expanded="false" aria-controls="versionNotes">📜 ดูรายการอัปเดต ▾</button>
             </div>
             <div class="version-notes" id="versionNotes">
                 <ul>
+                    <li><b>v2.6.5</b> — พิมพ์ซ้ำงานเดิม: ไม่คิดค่าบล็อกเฉพาะ Flexible Die · บล็อกไม้ยังคิดตามเดิม</li>
+                    <li><b>v2.6.4</b> — ชื่อกล่องตาม QC: เล็ก / กลาง / สูง · งานตัดแผ่นประมาณความหนาแพ็คจากงานจริง (แผ่นละ 0.33 มม. ปรับได้)</li>
+                    <li><b>v2.6.3</b> — ม้วนต่อกล่อง: เผื่อม้วนพันหลวม +10% และช่องว่างต่อม้วน 5 มม. (ปรับได้ในตั้งค่า) ให้ใกล้ของจริง</li>
+                    <li><b>v2.6.2</b> — ราคากล่องเล็ก C-NCS-0002 = 8 บาท/ใบ</li>
+                    <li><b>v2.6.1</b> — กล่องมาตรฐาน 3 ขนาดตาม QC พร้อมรหัส: เล็ก C-NCS-0002 / กลาง C-NCS-0001 / ใหญ่ C-NCS-0003 · กล่องที่ยังไม่มีราคาไม่ถูกเลือกอัตโนมัติ</li>
+                    <li><b>v2.6.0</b> (21/11/2569) — บรรจุภัณฑ์: เลือกแกน 3"/1.5"/1" · กล่อง A/B (+C) ตั้งขนาด/ราคาได้ · คำนวณม้วนต่อกล่องจากขนาดม้วน และแพ็คต่อกล่องสำหรับงานตัดแผ่น · เลือกกล่องคุ้มสุดอัตโนมัติ · ฟิล์มหดคิดตามน้ำหนัก (บาท/กก.) · ใส่จำนวนจริงทับได้</li>
                     <li><b>v2.5.6</b> — ใบสรุปต้นทุน: แถวบล็อก/เพลทไม่พ่วงราคาตั้งต้นในวงเล็บแล้ว + โชว์ราคาจริงตามบิลในแถวเดียวกัน</li>
                     <li><b>v2.5.5</b> — ใบสรุปต้นทุน: แถวรวมต้นทุน (แดง) / ยอดรวมสุทธิ (เขียว) / ราคาต่อดวง (เหลือง) เตี้ยลง ตัวเล็กลง</li>
                     <li><b>v2.5.4</b> — ใบสรุปต้นทุนกะทัดรัดขึ้น: หัวเอกสารเล็กลง ตัวอักษร 12px ระยะบรรทัดชิดขึ้น</li>
@@ -830,24 +836,65 @@
                     <input type="number" id="r_labelsPerRoll" value="1000" min="1" style="width:120px;" oninput="calcRoll()">
                 </div>
                 <div class="form-group" style="margin-bottom:6px;">
+                    <label style="font-size:0.78rem;">ขนาดแกน</label>
+                    <select id="r_coreSize" style="width:120px; font-size:0.8rem;" onchange="calcRoll()">
+                        <option value="3" selected>3 นิ้ว</option>
+                        <option value="1.5">1.5 นิ้ว</option>
+                        <option value="1">1 นิ้ว</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:6px;">
                     <label style="font-size:0.78rem;">ราคาแกนกระดาษ (บาท/ลูก)</label>
                     <input type="number" id="r_corePrice" value="2.50" step="0.25" style="width:120px;" oninput="calcRoll()">
                 </div>
-                <div class="form-group" style="margin-bottom:6px;">
-                    <label style="font-size:0.78rem;">จำนวนม้วนต่อกล่อง</label>
-                    <input type="number" id="r_rollsPerBox" value="20" min="1" step="1" style="width:120px;" oninput="calcRoll()">
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label style="font-size:0.78rem;">ราคากล่อง+วัสดุแพ็ค (บาท/กล่อง)</label>
-                    <input type="number" id="r_boxPrice" value="0" step="1" style="width:120px;" oninput="calcRoll()">
-                </div>
             </div>
             <div id="r_sheetPackWrapper" style="display:none;">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label style="font-size:0.78rem;">ค่าบรรจุภัณฑ์งานตัดแผ่น (บาท/งาน)</label>
-                    <input type="number" id="r_sheetPackCost" value="0" step="1" style="width:120px;" oninput="calcRoll()">
+                <div class="form-group" style="margin-bottom:6px;">
+                    <label style="font-size:0.78rem;">จำนวนดวงต่อ 1 แพ็ค</label>
+                    <input type="number" id="r_labelsPerPack" value="100" min="1" style="width:120px;" oninput="calcRoll()">
+                </div>
+                <div class="form-group" style="margin-bottom:6px;">
+                    <label style="font-size:0.78rem;">ความหนาแพ็คจริง (มม.) <span class="hint-text">(วัดได้ใส่ / เว้นว่าง = ระบบประมาณจากแผ่นละ 0.33 มม.)</span></label>
+                    <input type="number" id="r_packThk" value="" placeholder="ประมาณให้" step="0.5" style="width:120px;" oninput="calcRoll()">
                 </div>
             </div>
+            <div class="form-group" style="margin-bottom:6px;">
+                <label style="font-size:0.78rem;">กล่องที่ใช้</label>
+                <select id="r_boxType" style="width:135px; font-size:0.8rem;" onchange="onBoxTypeChanged()"></select>
+            </div>
+            <div class="form-group" style="margin-bottom:6px;">
+                <label style="font-size:0.78rem;" id="r_perBoxLabel">ม้วนต่อกล่อง <span class="hint-text">(เว้นว่าง = ระบบคำนวณ / รู้จำนวนจริงใส่ได้)</span></label>
+                <input type="number" id="r_perBoxOverride" value="" placeholder="คำนวณให้" min="1" step="1" style="width:120px;" oninput="calcRoll()">
+            </div>
+            <div id="r_boxManualWrap" style="display:none;">
+                <div class="form-group" style="margin-bottom:6px;">
+                    <label style="font-size:0.78rem;" id="r_rollsPerBoxLabel">จำนวนต่อกล่อง (กำหนดเอง)</label>
+                    <input type="number" id="r_rollsPerBox" value="20" min="1" step="1" style="width:120px;" oninput="calcRoll()">
+                </div>
+                <div class="form-group" style="margin-bottom:6px;">
+                    <label style="font-size:0.78rem;">ราคากล่อง+วัสดุแพ็ค (บาท/กล่อง)</label>
+                    <input type="number" id="r_boxPrice" value="0" step="0.5" style="width:120px;" oninput="calcRoll()">
+                </div>
+            </div>
+            <div class="checkbox-group" style="margin-bottom:6px;">
+                <div class="checkbox-left">
+                    <input type="checkbox" id="r_shrink" checked onchange="calcRoll()">
+                    <label for="r_shrink" id="r_shrinkLabel">ห่อฟิล์มหดทีละม้วน</label>
+                </div>
+                <input type="number" id="r_shrinkPrice" value="100" step="1" style="width:70px;" oninput="calcRoll()" title="ราคาฟิล์มหด บาท/กก.">
+            </div>
+            <div class="calc-hint show" id="r_packHint"></div>
+            <details class="sub-details">
+                <summary>⚙️ ตั้งค่ากล่อง / ความหนาสติกเกอร์ / ฟิล์มหด</summary>
+                <div style="font-size:0.75rem; color:#475569; margin:4px 0;">ขนาดภายในกล่อง (มม.) และราคาต่อใบ — แก้แล้วระบบจำไว้ในเครื่อง</div>
+                <div id="r_boxEditor"></div>
+                <div class="form-group"><label>ความหนาสติกเกอร์รวมกระดาษรอง (มม.)</label><input type="number" id="r_stickerThk" value="0.15" step="0.01" oninput="calcRoll()"></div>
+                <div class="form-group"><label>ความหนาต่อแผ่นในแพ็ค (มม.) <span class="hint-text">(งานตัดแผ่น · จากงานจริง 220×315: 100 แผ่น/แพ็ค 10 แพ็ค/กล่องสูง)</span></label><input type="number" id="r_sheetThkPack" value="0.33" step="0.01" min="0" oninput="calcRoll()"></div>
+                <div class="form-group"><label>ม้วนพันหลวม เผื่อความหนา (+%) <span class="hint-text">(ม้วนจริงโตกว่าทฤษฎี)</span></label><input type="number" id="r_rollLoose" value="10" step="1" min="0" oninput="calcRoll()"></div>
+                <div class="form-group"><label>เผื่อช่องว่างต่อม้วน (มม.) <span class="hint-text">(ฟิล์มย่น + ช่องหยิบใส่)</span></label><input type="number" id="r_rollGap" value="5" step="1" min="0" oninput="calcRoll()"></div>
+                <div class="form-group"><label>ฟิล์มหด (กรัม/ตร.ม.) <span class="hint-text">(~15–20 ไมครอน ≈ 18–25 ก.)</span></label><input type="number" id="r_filmGsm" value="20" step="1" oninput="calcRoll()"></div>
+                <div class="form-group"><label>ค่าบรรจุอื่นๆ เหมา (บาท/งาน)</label><input type="number" id="r_sheetPackCost" value="0" step="1" oninput="calcRoll()"></div>
+            </details>
         </div>
 
         <div class="section-title bg-pink">3. งานหลังพิมพ์ บล็อก เพลท & สีพิมพ์</div>
@@ -941,7 +988,7 @@
         <div class="calc-hint" id="r_blockEstHint"></div>
         <div class="repeat-order-box" style="padding:9px 10px;">
             <div class="checkbox-left" style="margin-bottom:5px;"><input type="checkbox" id="r_repeatOrder" onchange="calcRoll()"><label for="r_repeatOrder">🔁 พิมพ์ซ้ำงานเดิม</label></div>
-            <div class="repeat-order-note">ติ๊กเมื่อใช้บล็อกไดคัทเดิมที่มีอยู่แล้ว → ระบบจะ <b>ไม่คิดค่าบล็อกไดคัท</b> (ค่าเพลทพิมพ์ยังคิดตามปกติ เพราะเพลทอาจต้องเปลี่ยน)</div>
+            <div class="repeat-order-note">ติ๊กเมื่อใช้บล็อกเดิม → <b>Flexible Die ไม่คิดค่าบล็อก</b> · บล็อกไม้ยังคิดตามเดิม · ค่าเพลทพิมพ์ยังคิดตามปกติ (เพลทอาจต้องเปลี่ยน)</div>
             <div style="margin-top:6px;background:#fff;border:1px dashed #fca5a5;border-radius:6px;padding:6px 8px;font-size:0.78rem;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span>ค่าบล็อกที่กรอกไว้: <b id="r_repeatPlateOriginal">1,000.00 บาท</b></span><span>→ ค่าบล็อกที่คิดจริง: <b id="r_repeatPlateApplied" style="color:#991b1b;">1,000.00 บาท</b></span></div>
         </div>
 
@@ -1893,6 +1940,16 @@
     const MACHINE_TYPE_LABEL = { rotary: 'โรตารี่', intermittent: 'Intermittent (กดเป็นจังหวะ)', diecut: 'ไดคัทอย่างเดียว', offset: 'Offset Intermittent' };
 
     // ราคาบล็อกไดคัทตามชนิด (เลือกได้ทุกเครื่อง)
+    // ===== v2.6.0: กล่อง (ขนาดภายใน มม. + ราคา/ใบ) — แก้ได้ในหน้าจอ ระบบจำไว้ในเครื่อง =====
+    // v2.6.1: กล่องมาตรฐานจาก QC (ขนาดภายใน มม.)
+    const BOX_DEFAULTS = [
+        { key: 'C-NCS-0002', name: 'เล็ก 10⅜×12×5"', l: 263.5, w: 304.8, h: 127.0, price: 8 },
+        { key: 'C-NCS-0001', name: 'กลาง 11¼×11¼×9¼"', l: 285.7, w: 285.7, h: 235.0, price: 11.5 },
+        { key: 'C-NCS-0003', name: 'สูง 8⅞×12⅜×13⅜"', l: 225.4, w: 314.3, h: 339.7, price: 11 },
+        { key: 'X1', name: 'กล่องอื่น (ว่าง)', l: 0, w: 0, h: 0, price: 0 }
+    ];
+    const BOX_KEY_MIGRATE = { A: 'C-NCS-0001', B: 'C-NCS-0003' };   // งานที่บันทึกด้วย v2.6.0
+    const CORE_OD_MM = { '3': 84, '1.5': 44, '1': 31 };   // เส้นผ่านศูนย์กลางนอกของแกน (ประมาณ)
     const PC_PLATE_MACHINE_W = 430, PC_PLATE_MACHINE_H = 330; // Amsky Aura 400 ขอบเขตเครื่องยิงเพลท (มม.)
     const BLOCK_PRICES = { wood: 1000, flex_old: 5500, flex_offset: 6500 };
 
@@ -2358,6 +2415,12 @@
             document.getElementById('r_corePrice').value = "2.50";
             document.getElementById('r_rollsPerBox').value = "20";
             document.getElementById('r_boxPrice').value = "0";
+            document.getElementById('r_coreSize').value = "3";
+            document.getElementById('r_boxType').value = "auto";
+            document.getElementById('r_perBoxOverride').value = "";
+            document.getElementById('r_labelsPerPack').value = "100";
+            document.getElementById('r_packThk').value = "";
+            document.getElementById('r_shrink').checked = true;
             document.getElementById('r_sheetPackCost').value = "0";
             document.getElementById('r_cylRepeat').value = "";
             document.getElementById('r_cylTeeth').value = "";
@@ -2752,6 +2815,19 @@
             deliveryType: document.getElementById('r_deliveryType').value,
             labelsPerRoll: numVal('r_labelsPerRoll', 0) || 1000, corePrice: numVal('r_corePrice', 0),
             rollsPerBox: Math.max(1, numVal('r_rollsPerBox', 1)), boxPrice: numVal('r_boxPrice', 0),
+            coreSize: document.getElementById('r_coreSize').value,
+            boxType: document.getElementById('r_boxType').value || 'auto',
+            boxes: getBoxPresets(),
+            perBoxOverride: Math.max(0, parseInt(document.getElementById('r_perBoxOverride').value) || 0),
+            labelsPerPack: Math.max(1, numVal('r_labelsPerPack', 100)),
+            packThk: Math.max(0, numVal('r_packThk', 0)),
+            shrink: document.getElementById('r_shrink').checked,
+            shrinkPrice: Math.max(0, numVal('r_shrinkPrice', 0)),
+            stickerThk: numVal('r_stickerThk', 0.15),
+            filmGsm: Math.max(0, numVal('r_filmGsm', 20)),
+            rollLoose: Math.max(0, numVal('r_rollLoose', 10)),
+            sheetThkPack: Math.max(0, numVal('r_sheetThkPack', 0.33)),
+            rollGap: Math.max(0, numVal('r_rollGap', 5)),
             sheetPackCost: numVal('r_sheetPackCost', 0),
             optLaminate: document.getElementById('r_optLaminate').checked, lamPrice: numVal('r_lamPrice', 0),
             lamWidthInput: numVal('r_lamWidth', 0),
@@ -2844,8 +2920,9 @@
         const isRoll = p.deliveryType === 'roll';
         const finishedRollCount = isRoll && p.labelsPerRoll > 0 ? Math.ceil(qty / p.labelsPerRoll) : 0;
         const coreCostTotal = isRoll ? finishedRollCount * p.corePrice : 0;
-        const boxCount = isRoll ? Math.ceil(finishedRollCount / p.rollsPerBox) : 0;
-        const packCost = isRoll ? boxCount * p.boxPrice : p.sheetPackCost;
+        const pkg = computePackaging(p, pitch, finishedRollCount, qty);
+        const boxCount = pkg.boxCount;
+        const packCost = pkg.packCost;
 
         const lamWidth = p.lamWidthInput > 0 ? p.lamWidthInput : p.webWidth;
         const lamSqm = totalMeters * (lamWidth / 1000);
@@ -2877,7 +2954,9 @@
         const dieCost = p.isBlank ? 0 : (p.locks.plate ? p.manual.plate : plateAuto.cost);   // ชื่อเดิม dieCost = ค่าเพลทพิมพ์+ฟิล์ม
 
         // --- บล็อกไดคัท (พิมพ์ซ้ำ = ไม่คิดเฉพาะบล็อกไดคัท / ค่าเพลทยังคิด) ---
-        const plateCost = p.isRepeatOrder ? 0 : p.plateInput;   // ชื่อเดิม plateCost = ค่าบล็อกไดคัท
+        // v2.6.5: พิมพ์ซ้ำ = ไม่คิดค่าบล็อกเฉพาะ Flexible Die (ใช้ซ้ำได้) / บล็อกไม้ยังคิดตามเดิม
+        const repeatWaives = p.isRepeatOrder && p.blockType !== 'wood';
+        const plateCost = repeatWaives ? 0 : p.plateInput;   // ชื่อเดิม plateCost = ค่าบล็อกไดคัท
 
         // --- เวลา ---
         const speed = p.speed > 0 ? p.speed : (spec.speedEasy || 90);
@@ -2935,7 +3014,7 @@
 
         return {
             qty, across, produceQty, rows, netMeters, pitch, pitchDefault, realMeters, totalMeters, totalSqm, pass2Waste,
-            matCost, coreCostTotal, totalMatAndCore, finishedRollCount, boxCount, packCost,
+            matCost, coreCostTotal, totalMatAndCore, finishedRollCount, boxCount, packCost, pkg,
             lamWidth, lamSqm, laminateCost, uvCost, foilCost, foilMeters, deadeningCost,
             inkAuto, inkCost, inkWidthFactor, inkBaseMeters, plateAuto, dieCost, plateCost,
             speed, runMin, machineMin, pass2Min, postMin, autoHours, autoOpCost, hours, operatingCost,
@@ -3262,19 +3341,19 @@
         $('r_resTotalMeters').innerText = d.totalMeters.toFixed(2) + " เมตร" + (d.pass2Waste > 0 ? ` (รวม Waste ไดคัทรอบสอง ${d.pass2Waste} ม.)` : '');
         $('r_resSqm').innerText = d.totalSqm.toFixed(2) + " ตร.ม.";
         if (p.deliveryType === 'roll') {
-            $('r_resRollCount').innerText = d.finishedRollCount + ` ลูก (ม้วนละ ${p.labelsPerRoll.toLocaleString()} ดวง) · ${d.boxCount} กล่อง`;
+            $('r_resRollCount').innerText = d.finishedRollCount + ` ลูก (ม้วนละ ${p.labelsPerRoll.toLocaleString()} ดวง) · ${d.boxCount} กล่อง` + (d.pkg.box ? ` (${d.pkg.box.name.split(' ')[0]})` : '');
             $('r_resMatCost').innerText = fmtB(d.totalMatAndCore) + ` บาท (กระดาษ ${d.matCost.toFixed(2)} + แกน ${d.coreCostTotal.toFixed(2)})`;
         } else {
-            $('r_resRollCount').innerText = "ตัดเป็นแผ่นส่งมอบ (ไม่คิดค่าแกน)";
+            $('r_resRollCount').innerText = `ตัดเป็นแผ่น ${d.pkg.units} แพ็ค · ${d.boxCount} กล่อง` + (d.pkg.box ? ` (${d.pkg.box.name.split(' ')[0]})` : '');
             $('r_resMatCost').innerText = fmtB(d.totalMatAndCore) + ` บาท (เฉพาะค่ากระดาษ)`;
         }
         $('r_resPackCost').innerText = fmtB(d.packCost) + ' บาท' + (p.fileFee > 0 ? ` + ค่าไฟล์/Proof ${fmtB(p.fileFee)} บาท` : '');
         $('r_resOpCost').innerText = fmtB(d.operatingCost) + ` บาท (${d.hours.toFixed(2)} ชม.${p.locks.hours ? ' คีย์เอง' : ''})`;
-        $('r_resPlateCostApplied').innerText = fmtB(d.plateCost) + ' บาท' + (p.isRepeatOrder ? ' (พิมพ์ซ้ำ: ไม่คิดบล็อกไดคัท)' : '');
+        $('r_resPlateCostApplied').innerText = fmtB(d.plateCost) + ' บาท' + (p.isRepeatOrder ? (p.blockType === 'wood' ? ' (พิมพ์ซ้ำ: บล็อกไม้ยังคิดตามเดิม)' : ' (พิมพ์ซ้ำ: ไม่คิด Flexible Die)') : '');
         const repeatOriginalEl = $('r_repeatPlateOriginal');
         const repeatAppliedEl = $('r_repeatPlateApplied');
         if (repeatOriginalEl) repeatOriginalEl.innerText = fmtB(p.plateInput) + ' บาท';
-        if (repeatAppliedEl) { repeatAppliedEl.innerText = fmtB(d.plateCost) + ' บาท'; repeatAppliedEl.style.color = p.isRepeatOrder ? '#15803d' : '#991b1b'; }
+        if (repeatAppliedEl) { repeatAppliedEl.innerText = fmtB(d.plateCost) + ' บาท' + (p.isRepeatOrder && p.blockType === 'wood' ? ' (บล็อกไม้ไม่ลด)' : ''); repeatAppliedEl.style.color = (p.isRepeatOrder && d.plateCost === 0) ? '#15803d' : '#991b1b'; }
         $('r_resCostPerUnit').innerText = d.costPerUnit.toFixed(4) + " บาท/ดวง";
         $('r_resTotalCost').innerText = fmtB(d.totalProductionCost) + " บาท";
 
@@ -3311,6 +3390,7 @@
         renderPreChecklist(p, d);
         updateGroupSummaries(p, d);
         renderBlockEstimate(p, d);
+        renderPackHint(p, d);
         if (typeof renderPcBreakdowns === 'function') renderPcBreakdowns(p, d);
 
         // เก็บรายละเอียดต้นทุนแยกรายการไว้ใช้สร้าง "ใบสรุปต้นทุนและราคาขาย" / แถบสรุป / Job Ticket
@@ -3323,7 +3403,7 @@
             hourlyRate: p.hourlyRate, laborRate: p.laborRate, hoursLocked: p.locks.hours, inkLocked: p.locks.ink, plateLocked: p.locks.plate,
             shipping: p.shipping, vat: p.vat, minPrice: p.minPrice, commissionPct: p.commissionPct, fileFee: p.fileFee,
             actualBlock: p.actualBlock, actualPlate: p.actualPlate,
-            deliveryType: p.deliveryType, labelsPerRoll: p.labelsPerRoll, corePrice: p.corePrice, rollsPerBox: p.rollsPerBox, boxPrice: p.boxPrice,
+            deliveryType: p.deliveryType, labelsPerRoll: p.labelsPerRoll, corePrice: p.corePrice, rollsPerBox: d.pkg.perBox, boxPrice: d.pkg.boxPrice, labelsPerPack: p.labelsPerPack, shrink: p.shrink, coreSize: p.coreSize,
             webWidth: p.webWidth, colors: p.colors, whiteInk: p.whiteInk, coverage: p.coverage, runWastePct: p.runWastePct,
             setupWaste: p.waste, rowsPerRepeat: p.rowsPerRepeat, cylRepeat: p.cylRepeat, twoPass: p.twoPass,
             setupMin: p.setupMin, speedUnit: p.speedUnit, workType: p.workType, machineName: currentMachine.name
@@ -3486,6 +3566,147 @@
             + (Math.abs(p.plateInput - r.est) >= 1 ? `<a onclick="document.getElementById('r_plateCost').value=${r.est}; calcRoll();">ใช้ราคานี้</a>` : ' ✅ ใช้ราคานี้อยู่');
     }
 
+
+    // ===== v2.6.0: บรรจุภัณฑ์ — กล่อง / ม้วนต่อกล่อง / แพ็คต่อกล่อง / ฟิล์มหด =====
+    function getBoxPresets() {
+        let saved = null;
+        try { saved = JSON.parse(localStorage.getItem('vpack_boxes_v3') || 'null'); } catch (e) {}
+        return BOX_DEFAULTS.map(b => Object.assign({}, b, (saved && saved[b.key]) || {}));
+    }
+    function saveBoxPresets() {
+        const out = {};
+        BOX_DEFAULTS.forEach(b => {
+            const g = f => parseFloat(document.getElementById(`box_${b.key}_${f}`).value) || 0;
+            out[b.key] = { name: document.getElementById(`box_${b.key}_name`).value || b.name, l: g('l'), w: g('w'), h: g('h'), price: g('price') };
+        });
+        try { localStorage.setItem('vpack_boxes_v3', JSON.stringify(out)); } catch (e) {}
+        renderBoxSelect();
+        calcRoll();
+    }
+    function renderBoxEditor() {
+        const el = document.getElementById('r_boxEditor');
+        if (!el) return;
+        const inp = (id, v, w) => `<input type="number" id="${id}" value="${v}" step="0.01" style="width:${w}px; padding:1px 3px;" oninput="saveBoxPresets()">`;
+        el.innerHTML = `<table style="font-size:0.72rem; border-collapse:collapse; width:100%;"><tr style="color:#64748b;"><td>รหัส</td><td>ชื่อ</td><td>กว้าง</td><td>ยาว</td><td>สูง</td><td>บาท/ใบ</td></tr>`
+            + getBoxPresets().map(b => `<tr><td style="white-space:nowrap; color:#475569;">${b.key.startsWith('X') ? '-' : b.key}</td><td><input type="text" id="box_${b.key}_name" value="${b.name}" style="width:110px; padding:1px 3px;" oninput="saveBoxPresets()"></td><td>${inp(`box_${b.key}_l`, b.l, 52)}</td><td>${inp(`box_${b.key}_w`, b.w, 52)}</td><td>${inp(`box_${b.key}_h`, b.h, 52)}</td><td>${inp(`box_${b.key}_price`, b.price, 44)}</td></tr>`).join('')
+            + `</table>`;
+    }
+    function renderBoxSelect() {
+        const sel = document.getElementById('r_boxType');
+        if (!sel) return;
+        const cur = sel.value || 'auto';
+        sel.innerHTML = `<option value="auto">🤖 เลือกให้คุ้มสุด</option>`
+            + getBoxPresets().filter(b => b.l > 0 && b.w > 0 && b.h > 0).map(b => `<option value="${b.key}">${b.name}${b.price > 0 ? ' (' + fmtB(b.price) + ' บ.)' : ' (ยังไม่มีราคา)'}</option>`).join('')
+            + `<option value="manual">✍️ กำหนดเอง (จำนวน/กล่อง + ราคา)</option>`;
+        sel.value = [...sel.options].some(o => o.value === cur) ? cur : 'auto';
+    }
+    function onBoxTypeChanged() { calcRoll(); }
+
+    // นับจำนวนที่ใส่กล่องได้ (กล่องกระดาษยืดได้ ~1%)
+    function fitRollsInBox(box, D, W) {
+        if (!(D > 0 && W > 0)) return 0;
+        const L = box.l * 1.01, B = box.w * 1.01, H = box.h * 1.01;
+        const f = Math.floor;
+        return Math.max(
+            f(L / D) * f(B / D) * f(H / W),   // วางนอน (แกนตั้ง) ซ้อนเป็นชั้น
+            f(L / W) * f(B / D) * f(H / D),   // ตั้งม้วน แกนตามด้านยาว
+            f(B / W) * f(L / D) * f(H / D)    // ตั้งม้วน แกนตามด้านกว้าง
+        );
+    }
+    function fitPacksInBox(box, a, b, c) {
+        const d = [box.l * 1.01, box.w * 1.01, box.h * 1.01];
+        const perms = [[a, b, c], [a, c, b], [b, a, c], [b, c, a], [c, a, b], [c, b, a]];
+        return Math.max(0, ...perms.map(x => Math.floor(d[0] / x[0]) * Math.floor(d[1] / x[1]) * Math.floor(d[2] / x[2])));
+    }
+    function computePackaging(p, pitch, finishedRollCount, qty) {
+        const isRoll = p.deliveryType === 'roll';
+        const t = p.stickerThk > 0 ? p.stickerThk : 0.15;
+        const res = { isRoll, units: 0, unitName: isRoll ? 'ม้วน' : 'แพ็ค', perBox: 0, perBoxCalc: 0, box: null, boxCount: 0, boxPrice: 0,
+                      filmGram: 0, filmCostUnit: 0, filmCost: 0, packCost: 0, rollD: 0, rollW: 0, rollLenM: 0, packH: 0, kgPerBox: 0, fits: [] };
+        let fitFn;
+        if (isRoll) {
+            res.units = finishedRollCount;
+            const coreOD = CORE_OD_MM[String(p.coreSize)] || 84;
+            res.rollLenM = p.labelsPerRoll * pitch / 1000;
+            res.rollD = Math.sqrt(coreOD * coreOD + 4 * (res.rollLenM * 1000) * t / Math.PI);
+            res.rollW = p.w + Math.max(p.gapX, 2);
+            // v2.6.3: ขนาดที่ใช้ใส่กล่อง = ม้วนพันหลวม + ช่องว่าง (ฟิล์มย่น/ช่องหยิบใส่)
+            res.rollDFit = Math.sqrt(coreOD * coreOD + 4 * (res.rollLenM * 1000) * t * (1 + p.rollLoose / 100) / Math.PI) + p.rollGap;
+            res.rollWFit = res.rollW + p.rollGap;
+            const areaFilm = (2 * Math.PI * Math.pow(res.rollD / 2, 2) + Math.PI * res.rollD * res.rollW) / 1e6;
+            res.filmGram = areaFilm * 1.3 * p.filmGsm;
+            res.unitKg = res.rollLenM * (res.rollW / 1000) * 0.19;   // สติกเกอร์+กระดาษรองประมาณ 190 ก./ตร.ม.
+            fitFn = box => fitRollsInBox(box, res.rollDFit, res.rollWFit);
+        } else {
+            res.units = qty > 0 ? Math.ceil(qty / Math.max(1, p.labelsPerPack)) : 0;
+            res.packH = p.packThk > 0 ? p.packThk : (p.labelsPerPack * (p.sheetThkPack > 0 ? p.sheetThkPack : 0.33) + 1);   // v2.6.4: ค่าจากงานจริง
+            const areaFilm = 2 * (p.w * p.h + p.w * res.packH + p.h * res.packH) / 1e6;
+            res.filmGram = areaFilm * 1.3 * p.filmGsm;
+            res.unitKg = p.labelsPerPack * (p.w * p.h / 1e6) * 0.19;
+            fitFn = box => fitPacksInBox(box, p.w, p.h, res.packH);
+        }
+        res.filmCostUnit = res.filmGram / 1000 * p.shrinkPrice;
+        res.filmCost = p.shrink ? res.units * res.filmCostUnit : 0;
+        const boxes = p.boxes.filter(b => b.l > 0 && b.w > 0 && b.h > 0);
+        res.fits = boxes.map(b => ({ box: b, n: fitFn(b) }));
+        if (p.boxType === 'manual') {
+            res.perBox = Math.max(1, p.rollsPerBox);
+            res.boxPrice = p.boxPrice;
+        } else {
+            let pick = null;
+            if (p.boxType === 'auto') {
+                res.fits.forEach(f => {
+                    const n = p.perBoxOverride > 0 ? p.perBoxOverride : f.n;
+                    if (!(n > 0) || !(f.box.price > 0)) return;   // กล่องที่ยังไม่มีราคา ไม่เลือกอัตโนมัติ
+                    const cnt = Math.ceil(res.units / n), cost = cnt * f.box.price;
+                    if (!pick || cost < pick.cost - 0.001 || (Math.abs(cost - pick.cost) < 0.001 && cnt < pick.cnt)) pick = { f, cost, cnt };
+                });
+                pick = pick ? pick.f : null;
+            } else {
+                pick = res.fits.find(f => f.box.key === p.boxType) || null;
+            }
+            if (pick) { res.box = pick.box; res.perBoxCalc = pick.n; res.boxPrice = pick.box.price; }
+            res.perBox = p.perBoxOverride > 0 ? p.perBoxOverride : res.perBoxCalc;
+        }
+        res.boxCount = res.perBox > 0 && res.units > 0 ? Math.ceil(res.units / res.perBox) : 0;
+        res.kgPerBox = (res.unitKg || 0) * Math.min(res.perBox, res.units);
+        res.packCost = res.boxCount * res.boxPrice + res.filmCost + p.sheetPackCost;
+        return res;
+    }
+    function renderPackHint(p, d) {
+        const el = document.getElementById('r_packHint');
+        if (!el) return;
+        const k = d.pkg, roll = k.isRoll;
+        document.getElementById('r_boxManualWrap').style.display = p.boxType === 'manual' ? 'block' : 'none';
+        document.getElementById('r_perBoxLabel').innerHTML = `${roll ? 'ม้วน' : 'แพ็ค'}ต่อกล่อง <span class="hint-text">(เว้นว่าง = ระบบคำนวณ / รู้จำนวนจริงใส่ได้)</span>`;
+        document.getElementById('r_perBoxOverride').style.display = p.boxType === 'manual' ? 'none' : '';
+        document.getElementById('r_perBoxLabel').style.display = p.boxType === 'manual' ? 'none' : '';
+        document.getElementById('r_rollsPerBoxLabel').innerText = `${roll ? 'ม้วน' : 'แพ็ค'}ต่อกล่อง (กำหนดเอง)`;
+        document.getElementById('r_shrinkLabel').innerText = roll ? 'ห่อฟิล์มหดทีละม้วน (บาท/กก. →)' : 'ห่อฟิล์มหดทีละแพ็ค (บาท/กก. →)';
+        const pc = document.getElementById('r_perBoxOverride');
+        if (pc && p.boxType !== 'manual') pc.placeholder = k.perBoxCalc > 0 ? `คำนวณได้ ${k.perBoxCalc}` : 'ใส่ไม่ได้';
+        let html = roll
+            ? `🌀 ม้วนละ ${fmtB(k.rollLenM, 0)} ม. → ม้วนโต Ø ${fmtB(k.rollD, 0)} มม. หน้า ${fmtB(k.rollW, 0)} มม. (แกน ${p.coreSize}") · คิดเผื่อใส่กล่อง Ø ${fmtB(k.rollDFit, 0)} × ${fmtB(k.rollWFit, 0)} มม.`
+            : `📄 แพ็คละ ${p.labelsPerPack} ดวง ขนาด ${p.w}×${p.h} มม. หนา ${fmtB(k.packH, 1)} มม.${p.packThk > 0 ? ' (วัดจริง)' : ' (ประมาณ)'}`;
+        let warn = false;
+        if (p.boxType === 'manual') {
+            html += `<br>📦 กำหนดเอง ${k.perBox} ${k.unitName}/กล่อง × ${fmtB(k.boxPrice)} บ.`;
+        } else if (k.box) {
+            html += `<br>📦 ${k.box.name} [${k.box.key}]: ใส่ได้ประมาณ <b>${k.perBoxCalc} ${k.unitName}</b>` + (p.perBoxOverride > 0 ? ` · ใช้จำนวนจริง <b>${p.perBoxOverride}</b>` : '')
+                + ` → ${k.units} ${k.unitName} = <b>${k.boxCount} กล่อง</b> × ${fmtB(k.boxPrice)} บ.`;
+            const others = k.fits.filter(f => f.box.key !== k.box.key).map(f => `${f.box.name.split(' ')[0]}: ${f.n || 'ใส่ไม่ได้'}${f.box.price > 0 ? '' : ' (ไม่มีราคา)'}`).join(' · ');
+            if (others) html += ` <span style="color:#64748b;">(กล่องอื่น ${others})</span>`;
+        } else {
+            warn = true;
+            html += `<br>⚠️ ไม่มีกล่องที่ใส่${roll ? 'ม้วน' : 'แพ็ค'}ขนาดนี้ได้ — เลือก "กำหนดเอง" หรือเพิ่มขนาดกล่องในตั้งค่า`;
+        }
+        if (p.shrink) html += `<br>🎞️ ฟิล์มหด ~${fmtB(k.filmGram, 1)} ก./${k.unitName} = ${fmtB(k.filmCostUnit, 2)} บ. × ${k.units} = ${fmtB(k.filmCost)} บ.`;
+        if (k.kgPerBox > 0) html += `<br>⚖️ น้ำหนักประมาณ ${fmtB(k.kgPerBox, 1)} กก./กล่อง`;
+        html += `<br><b>รวมค่าบรรจุภัณฑ์ ${fmtB(k.packCost)} บาท</b>`;
+        el.className = 'calc-hint show' + (warn ? ' warn' : '');
+        el.innerHTML = html;
+    }
+
     // เช็กลิสต์ก่อนเสนอราคา: ช่องที่เป็น 0 / ค่าที่น่าสงสัย (เตือนเฉยๆ ไม่บล็อก)
     function renderPreChecklist(p, d) {
         const el = document.getElementById('r_checklist');
@@ -3495,7 +3716,8 @@
         if (p.matPrice <= 0) items.push('ราคากระดาษเป็น 0');
         if (p.waste <= 0) items.push('Setup Waste เป็น 0 เมตร (ปกติเผื่อ 200–300 ม.)');
         if (p.runWastePct <= 0) items.push('ไม่ได้เผื่อเสียระหว่างวิ่ง');
-        if (p.deliveryType === 'roll' && p.boxPrice <= 0) items.push('ยังไม่ใส่ราคากล่อง/วัสดุแพ็ค');
+        if (d.pkg.boxPrice <= 0) items.push('ยังไม่ได้คิดราคากล่อง');
+        if (!d.pkg.box && p.boxType !== 'manual') items.push('ไม่มีกล่องที่ใส่งานขนาดนี้ได้');
         if (p.minPrice <= 0) items.push('ไม่ได้ตั้งราคาขั้นต่ำต่อ Job');
         if (!p.isBlank && p.colors <= 0) items.push('จำนวนสีพิมพ์เป็น 0 (ถ้าไม่พิมพ์ ให้ติ๊ก "งานปั้มเปล่า")');
         if (p.spec.placeholder) items.push(`เครื่อง ${p.spec.name} ยังใช้ค่าสมมติ — ราคานี้ใช้ประมาณการเท่านั้น`);
@@ -3776,8 +3998,11 @@
                 
                 let deliveryInfo = deliveryType;
                 if(document.getElementById('r_deliveryType').value === 'roll') {
-                    deliveryInfo += ` (${document.getElementById('r_resRollCount').innerText} · กล่องละ ${jb.rollsPerBox || '-'} ม้วน)`;
+                    deliveryInfo += ` (${document.getElementById('r_resRollCount').innerText} · กล่องละ ${jb.rollsPerBox || '-'} ม้วน${jb.pkg && jb.pkg.box ? ' [' + jb.pkg.box.key + ']' : ''} · แกน ${jb.coreSize || 3}")`;
+                } else {
+                    deliveryInfo += ` (แพ็คละ ${jb.labelsPerPack || '-'} ดวง · ${document.getElementById('r_resRollCount').innerText} · กล่องละ ${jb.rollsPerBox || '-'} แพ็ค${jb.pkg && jb.pkg.box ? ' [' + jb.pkg.box.key + ']' : ''})`;
                 }
+                if (jb.shrink) deliveryInfo += ' · ห่อฟิล์มหด';
                 addRow('รูปแบบการส่งมอบงาน:', deliveryInfo);
 
                 addHeader('4. สรุปต้นทุนและราคา (Cost & Price Summary)');
@@ -3873,15 +4098,20 @@
             // v2.5.6: ชื่อชนิดบล็อกไม่พ่วงราคาตั้งต้น (กันเข้าใจผิดว่าราคาไม่เปลี่ยน) + โชว์ราคาจริงจากบิลในแถวเดียวกัน
             const blockTxt = ({ wood: 'บล็อกไม้', flex_old: 'Flexible Die ระบบเดิม', flex_offset: 'Flexible Die ระบบ Offset' })[b.blockType] || '';
             const actualTag = (v, est) => (v !== null && v !== undefined) ? ` → <b style="color:#047857;">จริงตามบิล ${fmtB(v)} บาท</b> (${v - est >= 0 ? '+' : ''}${fmtB(v - est)})` : '';
-            addRow('✂️ ค่าบล็อกไดคัท (Die-cut Block):', b.isRepeatOrder
-                ? `0.00 บาท (พิมพ์ซ้ำงานเดิม — ใช้บล็อกเดิม ราคา ${fmtB(b.plateInput || 0)} บาท ไม่คิดซ้ำ)`
-                : `${fmtB(b.plateCost || 0)} บาท (${blockTxt}${b.actualBlock !== null && b.actualBlock !== undefined ? ' · ราคาที่ประเมิน' : ''})` + actualTag(b.actualBlock, b.plateCost || 0));
+            addRow('✂️ ค่าบล็อกไดคัท (Die-cut Block):', (b.isRepeatOrder && b.plateCost === 0)
+                ? `0.00 บาท (พิมพ์ซ้ำงานเดิม — ใช้บล็อกเดิม (${blockTxt}) ราคา ${fmtB(b.plateInput || 0)} บาท ไม่คิดซ้ำ)`
+                : `${fmtB(b.plateCost || 0)} บาท (${blockTxt}${b.isRepeatOrder ? ' · พิมพ์ซ้ำ บล็อกไม้คิดตามเดิม' : ''}${b.actualBlock !== null && b.actualBlock !== undefined ? ' · ราคาที่ประเมิน' : ''})` + actualTag(b.actualBlock, b.plateCost || 0));
             addRow('🖼️ ค่าเพลทพิมพ์+ฟิล์ม (Print Plate):', `${fmtB(b.dieCost || 0)} บาท` + (b.plateLocked ? ' (คีย์เอง)' : ` (อัตโนมัติ ${b.plateAuto ? b.plateAuto.plates : 0} เพลท)`) + actualTag(b.actualPlate, b.dieCost || 0));
             addRow('🎨 ค่าสีพิมพ์ (Ink):', `${fmtB(b.inkCost || 0)} บาท` + (b.inkLocked ? ' (คีย์เอง)' : ` (อัตโนมัติ ${b.colors || 0} สี${b.whiteInk ? '+รองขาว' : ''} × ${fmtB(b.totalMeters || 0, 0)} ม.)`));
             addRow('⏱️ ค่าเครื่องจักร + แรงงาน:', b.hoursLocked
                 ? `${fmtB(b.operatingCost || 0)} บาท (คีย์เอง ${(b.hours || 0).toFixed(2)} ชม. x ${fmtB(b.hourlyRate || 0, 0)} บ./ชม.)`
                 : `${fmtB(b.operatingCost || 0)} บาท (เครื่อง ${((b.machineMin || 0) / 60).toFixed(2)} ชม. x ${fmtB(b.hourlyRate || 0, 0)}` + ((b.pass2Min || 0) > 0 ? ` + ไดคัท BSP ${((b.pass2Min) / 60).toFixed(2)} ชม.` : '') + ` + หลังพิมพ์ ${((b.postMin || 0) / 60).toFixed(2)} ชม. x ${fmtB(b.laborRate || 0, 0)})`);
-            addRow('📦 ค่าบรรจุภัณฑ์:', (b.packCost || 0) > 0 ? `${fmtB(b.packCost)} บาท` + (b.deliveryType === 'roll' ? ` (${b.boxCount || 0} กล่อง x ${fmtB(b.boxPrice || 0)} บ.)` : '') : 'ไม่ได้คิด');
+            {
+                const k = b.pkg || {};
+                addRow('📦 ค่าบรรจุภัณฑ์:', (b.packCost || 0) > 0
+                    ? `${fmtB(b.packCost)} บาท (${k.boxCount || 0} กล่อง${k.box ? ' ' + k.box.name.split(' ')[0] + ' [' + k.box.key + ']' : ''} x ${fmtB(k.boxPrice || 0)} บ. · ${k.perBox || 0} ${k.unitName || ''}/กล่อง` + (b.shrink && k.filmCost > 0 ? ` + ฟิล์มหด ${fmtB(k.filmCost)} บ.` : '') + `)`
+                    : 'ไม่ได้คิด');
+            }
             if ((b.fileFee || 0) > 0) addRow('🖥️ ค่าอาร์ตเวิร์ก/Proof:', `${fmtB(b.fileFee)} บาท`);
             addRowStrong('รวมต้นทุนการผลิตทั้งหมด (Total Cost):', `${(b.totalProductionCost || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท  (ตกดวงละ ${(b.costPerUnit || 0).toFixed(4)} บาท/ดวง)`, '#fef2f2', '#991b1b');
 
@@ -4542,6 +4772,16 @@
                 rowsLock: document.getElementById('r_rowsLock').checked,
                 rollsPerBox: document.getElementById('r_rollsPerBox').value,
                 boxPrice: document.getElementById('r_boxPrice').value,
+                coreSize: document.getElementById('r_coreSize').value,
+                boxType: document.getElementById('r_boxType').value,
+                perBoxOverride: document.getElementById('r_perBoxOverride').value,
+                labelsPerPack: document.getElementById('r_labelsPerPack').value,
+                packThk: document.getElementById('r_packThk').value,
+                shrink: document.getElementById('r_shrink').checked,
+                shrinkPrice: document.getElementById('r_shrinkPrice').value,
+                rollLoose: document.getElementById('r_rollLoose').value,
+                sheetThkPack: document.getElementById('r_sheetThkPack').value,
+                rollGap: document.getElementById('r_rollGap').value,
                 sheetPackCost: document.getElementById('r_sheetPackCost').value,
                 foilPerM: document.getElementById('r_foilPerM').value,
                 workType: document.getElementById('r_workType').value,
@@ -4914,6 +5154,15 @@
                 setV('r_inkMetersOverride', p.inkMetersOverride, '');
                 setV('r_actualBlock', p.actualBlock, ''); setV('r_actualPlate', p.actualPlate, '');
                 setV('r_rollsPerBox', p.rollsPerBox, '20'); setV('r_boxPrice', p.boxPrice, '0'); setV('r_sheetPackCost', p.sheetPackCost, '0');
+                if (p.boxType) {   // v2.6.0+
+                    setV('r_coreSize', p.coreSize, '3'); document.getElementById('r_boxType').value = BOX_KEY_MIGRATE[p.boxType] || p.boxType;
+                    if (document.getElementById('r_boxType').value !== (BOX_KEY_MIGRATE[p.boxType] || p.boxType)) document.getElementById('r_boxType').value = 'auto';
+                    setV('r_perBoxOverride', p.perBoxOverride, ''); setV('r_labelsPerPack', p.labelsPerPack, '100'); setV('r_packThk', p.packThk, '');
+                    setC('r_shrink', p.shrink); setV('r_shrinkPrice', p.shrinkPrice, '100');
+                    setV('r_rollLoose', p.rollLoose, '10'); setV('r_rollGap', p.rollGap, '5'); setV('r_sheetThkPack', p.sheetThkPack, '0.33');
+                } else {   // บันทึกก่อน v2.6.0: ใช้จำนวน/กล่อง + ราคาเดิม ไม่คิดฟิล์มหด → ราคาเท่าเดิม
+                    document.getElementById('r_boxType').value = 'manual'; setC('r_shrink', false); setV('r_perBoxOverride', '', '');
+                }
                 setV('r_foilPerM', p.foilPerM, '0');
                 setV('r_speed', p.speed, document.getElementById('r_speed').value); setV('r_speedUnit', p.speedUnit, document.getElementById('r_speedUnit').value);
                 setV('r_setupMin', p.setupMin, document.getElementById('r_setupMin').value);
@@ -4930,6 +5179,7 @@
                 // งานเก่า: ล็อกชั่วโมง/หมึก/เพลท ตามที่เคยคีย์ ไม่เผื่อเสียเพิ่ม ไม่ปัดราคา → ราคาเท่าเดิม (ดูค่าที่ระบบแนะนำได้ใต้ช่อง)
                 setV('r_actualBlock', '', ''); setV('r_actualPlate', '', '');
                 setV('r_runWaste', '0', '0'); setV('r_cylRepeat', '', ''); setV('r_cylTeeth', '', ''); setC('r_rowsLock', false); setV('r_boxPrice', '0', '0'); setV('r_sheetPackCost', '0', '0');
+                document.getElementById('r_boxType').value = 'manual'; setC('r_shrink', false);
                 setV('r_fileFee', '0', '0'); setV('r_foilPerM', '0', '0'); setV('r_commission', '0', '0');
                 setV('r_laborRate', p.hourlyRate, String(STD_RATE_DEFAULT));
                 setC('r_twoPass', false);
@@ -5130,6 +5380,8 @@
         alert('ส่งคำขอทดสอบไปที่ Google Sheets แล้วครับ กรุณาเปิด Sheet เพื่อตรวจสอบว่ามีแถวใหม่ขึ้นมาหรือไม่ (อาจใช้เวลา 2-3 วินาที)');
     }
 
+    renderBoxEditor();
+    renderBoxSelect();
     initCollapsibles();
     renderMaterialDropdowns();
     applyRollMaterialPreset();
