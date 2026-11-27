@@ -528,6 +528,11 @@
         .margin-advice { display: none; font-size: 0.72rem; border-radius: 5px; padding: 3px 8px; margin-bottom: 5px; }
         .margin-advice.show { display: block; }
         .margin-advice.tip { background: #eff6ff; border: 1px dashed #93c5fd; color: #1e40af; }
+        .mp-btn.mp-down { border-color: #fcd34d; color: #92400e; }
+        .mp-btn.mp-floor { border-color: #fca5a5; color: #991b1b; }
+        .mp-btn.mp-down.active { background: #d97706; border-color: #d97706; color: #fff; }
+        .mp-btn.mp-floor.active { background: #dc2626; border-color: #dc2626; color: #fff; }
+        .margin-advice.info { background: #fffbeb; border: 1px dashed #fcd34d; color: #92400e; }
         .margin-advice.warn { background: #fef2f2; border: 1px dashed #fca5a5; color: #991b1b; }
         .margin-advice a { font-weight: bold; text-decoration: underline; cursor: pointer; margin-left: 4px; }
 
@@ -591,11 +596,13 @@
     <div class="version-badge-row">
         <div class="version-badge-wrap">
             <div class="version-badge-line">
-                <div class="system-version-badge">V-Pack Estimator v2.6.5</div>
+                <div class="system-version-badge">V-Pack Estimator v2.6.7</div>
                 <button type="button" class="version-toggle-btn" id="versionToggleBtn" onclick="toggleVersionNotes()" aria-expanded="false" aria-controls="versionNotes">📜 ดูรายการอัปเดต ▾</button>
             </div>
             <div class="version-notes" id="versionNotes">
                 <ul>
+                    <li><b>v2.6.7</b> — ปุ่มบวกกำไร 5 ระดับ: พื้นต่ำสุด 25% / ลูกค้าประจำ 27% / ปกติ 30% / ล็อตเล็ก 35% / ด่วน 40% พร้อมคำเตือนตามระดับ</li>
+                    <li><b>v2.6.6</b> — ใบเสนอราคา: เพิ่มเงื่อนไขข้อ 6 เรื่องบล็อก/งานพิมพ์ซ้ำ อัตโนมัติตามชนิดบล็อก (บล็อกไม้ = ไม่มีส่วนลดงานพิมพ์ซ้ำ / Flexible Die = งานซ้ำไม่คิดค่าบล็อก)</li>
                     <li><b>v2.6.5</b> — พิมพ์ซ้ำงานเดิม: ไม่คิดค่าบล็อกเฉพาะ Flexible Die · บล็อกไม้ยังคิดตามเดิม</li>
                     <li><b>v2.6.4</b> — ชื่อกล่องตาม QC: เล็ก / กลาง / สูง · งานตัดแผ่นประมาณความหนาแพ็คจากงานจริง (แผ่นละ 0.33 มม. ปรับได้)</li>
                     <li><b>v2.6.3</b> — ม้วนต่อกล่อง: เผื่อม้วนพันหลวม +10% และช่องว่างต่อม้วน 5 มม. (ปรับได้ในตั้งค่า) ให้ใกล้ของจริง</li>
@@ -1116,7 +1123,9 @@
         </div>
         <div class="margin-presets">
             <span class="mp-label">ประเภทงาน:</span>
-            <button type="button" class="mp-btn" data-k="43" onclick="setMarginPreset(43)">งานปกติ · Margin 30%</button>
+            <button type="button" class="mp-btn mp-floor" data-k="33.4" onclick="setMarginPreset(33.4)" title="ต่ำกว่านี้ต้องให้เจ้านายอนุมัติ">พื้นต่ำสุด · 25%</button>
+            <button type="button" class="mp-btn mp-down" data-k="37" onclick="setMarginPreset(37)" title="สั่งต่อเนื่อง จ่ายตรง">ลูกค้าประจำ · 27%</button>
+            <button type="button" class="mp-btn" data-k="43" onclick="setMarginPreset(43)">งานปกติ · 30%</button>
             <button type="button" class="mp-btn" data-k="54" onclick="setMarginPreset(54)">ล็อตเล็ก / งานยาก / ลูกค้าใหม่ · 35%</button>
             <button type="button" class="mp-btn" data-k="67" onclick="setMarginPreset(67)">ยากมาก / งานด่วน · 40%</button>
         </div>
@@ -3881,6 +3890,26 @@
         + "4. ค่าบล็อกไดคัท/เพลทพิมพ์ เป็นค่าใช้จ่ายครั้งแรก บริษัทฯ เก็บรักษาไว้ใช้สำหรับงานสั่งซ้ำ หากแก้ไขแบบหรือเพลทชำรุด อาจมีค่าทำใหม่<br>"
         + "5. การชำระเงิน: ตามเงื่อนไขที่ตกลงกับบริษัทฯ / ราคานี้ยังไม่รวมค่าขนส่ง หากไม่ได้ระบุไว้ในรายการ";
 
+    // v2.6.6: เงื่อนไขเรื่องบล็อก/งานพิมพ์ซ้ำ ใส่ให้อัตโนมัติตามชนิดบล็อกที่เลือก (กันขอลดราคางานพิมพ์ซ้ำภายหลัง)
+    function buildQuoteConditions() {
+        let html = QUOTE_CONDITIONS_HTML;
+        const typeEl = document.getElementById('r_plateType');
+        if (!typeEl || (typeof activeTab !== 'undefined' && activeTab === 'sheet')) return html;
+        const type = typeEl.value;
+        const repeat = document.getElementById('r_repeatOrder').checked;
+        let line = '';
+        if (type === 'wood') {
+            line = repeat
+                ? '6. งานนี้เป็นงานพิมพ์ซ้ำโดยใช้บล็อกมาตรฐาน (บล็อกไม้) ราคาต่อดวงคิดตามใบเสนอราคานี้ ไม่มีส่วนลดงานพิมพ์ซ้ำ'
+                : '6. ราคานี้ใช้บล็อกมาตรฐาน (บล็อกไม้) งานพิมพ์ซ้ำครั้งต่อไปราคาต่อดวงเท่าเดิม <b>ไม่มีส่วนลดงานพิมพ์ซ้ำ</b> หากยอดสั่งเพิ่มขึ้น บริษัทฯ สามารถเปลี่ยนเป็นบล็อก Flexible Die และพิจารณาปรับลดราคางานพิมพ์ซ้ำได้ตั้งแต่ครั้งที่ 2 หลังเปลี่ยนบล็อก';
+        } else {
+            line = repeat
+                ? '6. งานนี้เป็นงานพิมพ์ซ้ำ ใช้บล็อก Flexible Die เดิมของงาน ไม่คิดค่าบล็อก (ค่าเพลทพิมพ์คิดตามจริง หากต้องเปลี่ยนเพลท)'
+                : '6. ราคานี้รวมค่าบล็อก Flexible Die ครั้งแรกแล้ว งานพิมพ์ซ้ำครั้งต่อไปที่ใช้แบบเดิม จะไม่คิดค่าบล็อก (หากแก้ไขแบบหรือขนาด ต้องทำบล็อกใหม่)';
+        }
+        return html + '<br>' + line;
+    }
+
     function generateQuotation() {
         const selectedMode = document.getElementById(activeTab === 'sheet' ? 's_globalDocMode' : 'r_globalDocMode').value;
         const printQ = document.getElementById('quotationPrintArea');
@@ -4188,7 +4217,7 @@
             sigCust.style.display = "grid";
             sigInt.style.display = "none";
             addrBlock.style.display = "flex";
-            condBox.innerHTML = QUOTE_CONDITIONS_HTML;
+            condBox.innerHTML = buildQuoteConditions();
         }
 
         const saleNameVal = document.getElementById('g_saleName').value.trim();
@@ -5909,6 +5938,8 @@ renderMachineInfo();
 const POLICY_MIN_MARKUP = 43;   // นโยบาย: Margin ไม่ต่ำกว่า 30% (= บวกกำไร 43)
 const SMALL_LOT_QTY = 10000;    // จำนวนน้อยกว่านี้ = งานล็อตเล็ก
 const SMALL_LOT_MARKUP = 54;    // งานล็อตเล็กแนะนำบวก 54 (Margin 35%)
+const REGULAR_MARKUP = 37;      // v2.6.7: ลูกค้าประจำ บวก 37 (Margin 27%)
+const FLOOR_MARKUP = 33.4;      // v2.6.7: พื้นต่ำสุด บวก 33.4 (Margin 25%) — ต่ำกว่านี้ต้องให้เจ้านายอนุมัติ
 (function () {
   const $ = id => document.getElementById(id);
   window.setMarginPreset = function (k) { $('r_margin').value = k; calcRoll(); };
@@ -5921,8 +5952,12 @@ const SMALL_LOT_MARKUP = 54;    // งานล็อตเล็กแนะน
     const b = window.rollCostBreakdown || {};
     if (!isNaN(override) && override > 0) {
       if (b.qty > 0 && b.marginPercent < 30) { cls = 'warn'; html = '⚠️ ราคาที่กำหนดเองได้ Margin ' + (b.marginPercent || 0).toFixed(2) + '% ต่ำกว่านโยบาย 30% — ควรให้เจ้านายอนุมัติก่อนเสนอลูกค้า'; }
+    } else if (k < FLOOR_MARKUP - 0.001) {
+      cls = 'warn'; html = '⛔ บวกกำไร ' + k + ' ต่ำกว่าพื้นต่ำสุด (Margin 25%) — ต้องให้เจ้านายอนุมัติก่อนเสนอลูกค้า<a onclick="setMarginPreset(' + FLOOR_MARKUP + ')">ปรับเป็นพื้นต่ำสุด</a><a onclick="setMarginPreset(' + POLICY_MIN_MARKUP + ')">กลับไปราคาปกติ</a>';
+    } else if (k < REGULAR_MARKUP - 0.001) {
+      cls = 'warn'; html = '⚠️ ระดับพื้นต่ำสุด (Margin ~25–27%) — ใช้เฉพาะงานที่ต้องการได้ลูกค้าจริงๆ ควรแจ้งเจ้านาย และถ้ามีค่าคอมนายหน้า ต้องใส่ในช่องค่าคอมด้วย<a onclick="setMarginPreset(' + POLICY_MIN_MARKUP + ')">กลับไปราคาปกติ</a>';
     } else if (k < POLICY_MIN_MARKUP) {
-      cls = 'warn'; html = '⚠️ บวกกำไร ' + k + ' ต่ำกว่านโยบาย (Margin 30% = บวก ' + POLICY_MIN_MARKUP + ') — ควรให้เจ้านายอนุมัติ<a onclick="setMarginPreset(' + POLICY_MIN_MARKUP + ')">ปรับเป็น ' + POLICY_MIN_MARKUP + '</a>';
+      cls = 'info'; html = '🤝 ราคาลูกค้าประจำ (Margin ~27–30%) ต่ำกว่านโยบายปกติ 30% — ใช้กับลูกค้าที่สั่งต่อเนื่อง · งานยอดมากได้ราคาต่อดวงถูกลงเองอยู่แล้วจากค่าตั้งเครื่องที่ถูกหาร<a onclick="setMarginPreset(' + POLICY_MIN_MARKUP + ')">กลับไปราคาปกติ</a>';
     } else if (qty > 0 && qty < SMALL_LOT_QTY && k < SMALL_LOT_MARKUP) {
       cls = 'tip'; html = '💡 จำนวน ' + qty.toLocaleString('th-TH') + ' ดวง (น้อยกว่า ' + SMALL_LOT_QTY.toLocaleString('th-TH') + ') นับเป็นงานล็อตเล็ก แนะนำบวก ' + SMALL_LOT_MARKUP + ' (Margin 35%)<a onclick="setMarginPreset(' + SMALL_LOT_MARKUP + ')">ใช้ ' + SMALL_LOT_MARKUP + '</a>';
     }
