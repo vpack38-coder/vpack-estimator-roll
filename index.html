@@ -523,6 +523,13 @@
         /* ===== v2.2.0: ปุ่มเลือกประเภทงาน -> บวกกำไร ===== */
         .margin-presets { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 0 0 4px; }
         .mp-label { font-size: 0.72rem; color: #475569; font-weight: bold; }
+        .rw-row { display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin:-2px 0 6px; }
+        .rw-btn { font-size:0.7rem; padding:1px 8px; border-radius:999px; border:1px solid #cbd5e1; background:#fff; color:#334155; cursor:pointer; font-family:inherit; }
+        .rw-btn:hover { background:#f1f5f9; }
+        .rw-btn.active { background:#0369a1; border-color:#0369a1; color:#fff; }
+        .rw-info { font-size:0.7rem; color:#2563eb; cursor:pointer; margin-left:2px; }
+        .rw-help { display:none; width:100%; font-size:0.7rem; color:#475569; background:#f8fafc; border:1px solid #e2e8f0; border-radius:4px; padding:3px 6px; line-height:1.4; }
+        .rw-help.show { display:block; }
         .mp-btn { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; border: 1px solid #cbd5e1; background: #fff; color: #334155; cursor: pointer; font-family: inherit; }
         .mp-btn.active { background: #15803d; border-color: #15803d; color: #fff; }
         .margin-advice { display: none; font-size: 0.72rem; border-radius: 5px; padding: 3px 8px; margin-bottom: 5px; }
@@ -596,11 +603,16 @@
     <div class="version-badge-row">
         <div class="version-badge-wrap">
             <div class="version-badge-line">
-                <div class="system-version-badge">V-Pack Estimator v2.6.7</div>
+                <div class="system-version-badge">V-Pack Estimator v2.7.2</div>
                 <button type="button" class="version-toggle-btn" id="versionToggleBtn" onclick="toggleVersionNotes()" aria-expanded="false" aria-controls="versionNotes">📜 ดูรายการอัปเดต ▾</button>
             </div>
             <div class="version-notes" id="versionNotes">
                 <ul>
+                    <li><b>v2.7.2</b> — SANKI SMP-300 เผื่อเสียระหว่างวิ่งตั้งต้น 5% (เดิม 3%)</li>
+                    <li><b>v2.7.1</b> — ปุ่มเผื่อเสียระหว่างวิ่ง: ล็อตใหญ่ 2.5% / ทั่วไป 5% / งานยาก 8% (จากรายงานของเสียจริง) + คำอธิบายย่อ</li>
+                    <li><b>v2.7.0</b> — ไดคัทแยกเครื่อง BSP 3231: แก้ ตั้งเครื่อง/Waste/สปีด (แถว·ครั้งกด·เมตร ต่อนาที)/เรต ได้บนหน้าจอ</li>
+                    <li><b>v2.6.9</b> — ตรวจเช็คหลังพิมพ์: งานม้วน = 0 (คนสลิทตรวจไปพร้อมกัน) · งานตัดแผ่น = 0.5 นาที/1,000 ดวง (คนห่อตรวจ) เปลี่ยนให้อัตโนมัติเมื่อเลือกรูปแบบส่งมอบ</li>
+                    <li><b>v2.6.8</b> — เรตแรงงานหลังพิมพ์ตั้งต้น 120 บาท/ชม./คน (จากเงินเดือน ~15,000) แทน 425 — ใบงานเก่ายังใช้เรตเดิม</li>
                     <li><b>v2.6.7</b> — ปุ่มบวกกำไร 5 ระดับ: พื้นต่ำสุด 25% / ลูกค้าประจำ 27% / ปกติ 30% / ล็อตเล็ก 35% / ด่วน 40% พร้อมคำเตือนตามระดับ</li>
                     <li><b>v2.6.6</b> — ใบเสนอราคา: เพิ่มเงื่อนไขข้อ 6 เรื่องบล็อก/งานพิมพ์ซ้ำ อัตโนมัติตามชนิดบล็อก (บล็อกไม้ = ไม่มีส่วนลดงานพิมพ์ซ้ำ / Flexible Die = งานซ้ำไม่คิดค่าบล็อก)</li>
                     <li><b>v2.6.5</b> — พิมพ์ซ้ำงานเดิม: ไม่คิดค่าบล็อกเฉพาะ Flexible Die · บล็อกไม้ยังคิดตามเดิม</li>
@@ -809,7 +821,14 @@
         </div>
         <div class="form-group">
             <label>เผื่อเสียระหว่างวิ่ง/ผลิตเผื่อ (%) <span class="hint-text">(ดวงเสีย ต่อม้วน ตรวจคัดทิ้ง)</span></label>
-            <input type="number" id="r_runWaste" value="3" step="0.5" min="0" oninput="calcRoll()">
+            <input type="number" id="r_runWaste" value="5" step="0.5" min="0" oninput="calcRoll()">
+        </div>
+        <div class="rw-row">
+            <button type="button" class="rw-btn" data-v="2.5" onclick="setRunWaste(2.5)" title="100,000 ดวงขึ้นไป · งานง่าย">ล็อตใหญ่ 2.5%</button>
+            <button type="button" class="rw-btn" data-v="5" onclick="setRunWaste(5)" title="ไม่เกิน 50,000 ดวง · งานทั่วไป">ทั่วไป 5%</button>
+            <button type="button" class="rw-btn" data-v="8" onclick="setRunWaste(8)" title="PP ใส · หลายสี · ฟอยล์ · ทะเบียนละเอียด">งานยาก 8%</button>
+            <span class="rw-info" onclick="document.getElementById('rw_help').classList.toggle('show')">ℹ️ ใช้ปุ่มไหน?</span>
+            <div id="rw_help" class="rw-help">จากรายงานของเสียจริง (ส.ค.–ต.ค. 69): งานไม่เกิน 5 หมื่นดวงเกินมา 3–7% · งานแสนดวงขึ้นไป 1–2% · PP ใส 4 สี ~10%<br>ส่วนนี้คือกระดาษ+เวลาที่ใช้จริง (ดวงเสีย + พิมพ์เกินกันขาด) · Waste ตั้งเครื่องคิดแยกในช่องเมตรข้างบนแล้ว</div>
         </div>
         <div class="form-group">
             <label>จำนวนแถวบนเพลท 1 แผ่น <span class="hint-text">(ระบบคิดให้จากความสูงดวง)</span> <label class="lock-tag"><input type="checkbox" id="r_rowsLock" onchange="onRowsLockToggle()"> 🔒 คีย์เอง</label></label>
@@ -832,7 +851,7 @@
             <div style="font-weight:bold; font-size:0.8rem; color:#166534; margin-bottom:6px;">📦 รูปแบบการส่งมอบ & แกนกระดาษ (Core)</div>
             <div class="form-group" style="margin-bottom:6px;">
                 <label style="font-size:0.78rem;">ลักษณะการส่งมอบงาน</label>
-                <select id="r_deliveryType" style="width:135px; font-size:0.8rem;" onchange="toggleDeliveryType()">
+                <select id="r_deliveryType" style="width:135px; font-size:0.8rem;" onchange="toggleDeliveryType(true)">
                     <option value="roll" selected>🌀 ส่งมอบเป็นม้วน</option>
                     <option value="sheet">📄 ตัดเป็นแผ่น (ไม่ใช้แกน)</option>
                 </select>
@@ -1095,17 +1114,33 @@
         <details class="sub-details">
             <summary>🧰 เวลาหลังพิมพ์ (สลิท / ตรวจเช็ค / แพ็ค) และเรตแรงงาน</summary>
             <div class="form-group"><label>สลิทม้วน (นาที/1,000 ดวง)</label><input type="number" id="r_ppSlit" value="0.5" step="0.1" min="0" oninput="calcRoll()"></div>
-            <div class="form-group"><label>ตรวจเช็ค (นาที/1,000 ดวง)</label><input type="number" id="r_ppCheck" value="0.5" step="0.1" min="0" oninput="calcRoll()"></div>
+            <div class="form-group"><label>ตรวจเช็ค (นาที/1,000 ดวง) <span class="hint-text">(ม้วน: คนสลิทตรวจไปด้วย = 0 · ตัดแผ่น: คนห่อตรวจ)</span></label><input type="number" id="r_ppCheck" value="0" step="0.1" min="0" oninput="calcRoll()"></div>
             <div class="form-group"><label>แพ็คลงกล่อง (นาที/1,000 ดวง)</label><input type="number" id="r_ppPack" value="0.5" step="0.1" min="0" oninput="calcRoll()"></div>
             <div class="form-group"><label>เตรียม/เก็บงานคงที่ (นาที)</label><input type="number" id="r_ppFixed" value="20" min="0" oninput="calcRoll()"></div>
-            <div class="form-group"><label>เรตแรงงานหลังพิมพ์ (บาท/ชม.) <span class="hint-text">(ใส่เรตคนจริงได้ — ค่าตั้งต้นเท่าเรตเดิม)</span></label><input type="number" id="r_laborRate" value="425" oninput="calcRoll()"></div>
+            <div class="form-group"><label>เรตแรงงานหลังพิมพ์ (บาท/ชม. ต่อคน) <span class="hint-text">(เงินเดือน 15,000 ÷ 26 วัน ÷ 8 ชม. ×1.2 + ค่าเครื่องสลิท/ไฟ ≈ 120)</span></label><input type="number" id="r_laborRate" value="120" oninput="calcRoll()"></div>
         </details>
         </details>
         <div class="checkbox-group" style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; padding:6px 8px;">
             <div class="checkbox-left">
-                <input type="checkbox" id="r_twoPass" onchange="calcRoll()">
+                <input type="checkbox" id="r_twoPass" onchange="toggleTwoPassBox(); calcRoll()">
                 <label for="r_twoPass">✂️ ไดคัทแยกเครื่อง (พิมพ์เสร็จแล้วไปไดคัทที่ BSP 3231) <span class="hint-text">(+ตั้งเครื่อง/Waste/เวลารอบสอง)</span></label>
             </div>
+        </div>
+        <div id="r_p2Box" style="display:none; background:#f8fbff; border:1px dashed #bfdbfe; border-radius:6px; padding:4px 8px; margin-top:-4px; font-size:0.78rem;">
+            <div style="display:flex; flex-wrap:wrap; gap:4px 10px; align-items:center;">
+                <span>ตั้งเครื่อง <input type="number" id="r_p2Setup" value="45" min="0" style="width:52px;" oninput="calcRoll()"> นาที</span>
+                <span>Waste ตั้งเครื่อง <input type="number" id="r_p2Waste" value="100" min="0" style="width:56px;" oninput="calcRoll()"> ม.</span>
+                <span>สปีด <input type="number" id="r_p2Speed" min="0" style="width:56px;" placeholder="อัตโนมัติ" oninput="calcRoll()">
+                    <select id="r_p2SpeedUnit" onchange="calcRoll()" style="font-size:0.75rem; width:100px;">
+                        <option value="imp">ครั้งกด/นาที</option>
+                        <option value="lpm">ดวง/นาที</option>
+                        <option value="row">แถว/นาที</option>
+                        <option value="mpm">เมตร/นาที</option>
+                    </select></span>
+                <span>ดวงต่อการกด 1 ครั้ง <input type="number" id="r_p2PerStroke" min="0" style="width:52px;" placeholder="อัตโนมัติ" oninput="calcRoll()"></span>
+                <span>เรต <input type="number" id="r_p2Rate" value="425" min="0" style="width:56px;" oninput="calcRoll()"> บาท/ชม.</span>
+            </div>
+            <div class="hint-text" id="r_p2Hint">สปีดเว้นว่าง = ค่ากลางจากงานจริง (งานง่าย 50 / งานยาก 40 ครั้งกด/นาที) · ดวงต่อการกด = จำนวนช่องดวงบนบล็อกไดคัท</div>
         </div>
         <div class="form-group">
             <label>เวลาที่ใช้รวม (ชม.) <label class="lock-tag"><input type="checkbox" id="r_hoursLock" onchange="onLockToggle('hours')"> 🔒 คีย์เอง</label></label>
@@ -1792,6 +1827,8 @@
     // v1.20.0: เรตมาตรฐานกลาง "ค่าดำเนินการและโสหุ้ยเครื่องจักร" (บาท/ชม.) — แก้ที่เดียวตรงนี้
     const STD_RATE_MIN = 400;
     const STD_RATE_MAX = 450;
+    const P2_SPEED_EASY = 50, P2_SPEED_HARD = 40;   // v2.7.0: BSP3231 ไดคัทรอบสอง ครั้งกด/นาที (จากงานจริงที่ช่างสแกน)
+    const LABOR_RATE_DEFAULT = 120; // v2.6.8: ค่าแรงหลังพิมพ์ต่อคน (เงินเดือน ~15,000)
     const STD_RATE_DEFAULT = 425; // ค่ากลางของช่วงมาตรฐาน ใช้เป็นค่าเริ่มต้น/ค่า fallback ของงานใหม่
 
     function toggleVersionNotes() {
@@ -1937,7 +1974,7 @@
     // runWaste: % เผื่อเสียระหว่างวิ่ง · rate: บาท/ชม. (ค่าเครื่อง+โสหุ้ย) · plate: 'inhouse' (ยิงเพลทเอง) / 'outsource' (สั่งร้านนอก)
     // * เครื่องเดิมใช้สปีด/ตั้งเครื่องชุดเดียวกับเครื่องคำนวณเวลาเดิม เพื่อให้ราคาไม่กระโดด — ปรับตามสถิติหน้างานจริงได้
     const machineSpecs = {
-        'smp300':       { name: 'SANKI SMP-300', maxWeb: 300, type: 'intermittent', speedUnit: 'row', speedEasy: 90,  speedHard: 70, setupMin: 60, setupWaste: 250, runWaste: 3, rate: 425, plate: 'inhouse' },
+        'smp300':       { name: 'SANKI SMP-300', maxWeb: 300, type: 'intermittent', speedUnit: 'row', speedEasy: 90,  speedHard: 70, setupMin: 60, setupWaste: 250, runWaste: 5, rate: 425, plate: 'inhouse' },   // v2.7.2: เผื่อเสีย 5% จากรายงานของเสียจริง
         'bs300':        { name: 'Bungsung BS300', maxWeb: 300, type: 'intermittent', speedUnit: 'row', speedEasy: 110, speedHard: 90, setupMin: 45, setupWaste: 250, runWaste: 3, rate: 425, plate: 'inhouse' },
         'skp250_cream': { name: 'SANKI SKP-250A_CREAM', maxWeb: 250, type: 'rotary', speedUnit: 'row', speedEasy: 90, speedHard: 70, setupMin: 60, setupWaste: 250, runWaste: 3, rate: 425, plate: 'inhouse' },
         'skp250_green': { name: 'SANKI SKP-250A_GREEN', maxWeb: 250, type: 'rotary', speedUnit: 'row', speedEasy: 90, speedHard: 70, setupMin: 60, setupWaste: 250, runWaste: 3, rate: 425, plate: 'inhouse' },
@@ -2019,8 +2056,25 @@
         calcRoll();
     }
 
-    function toggleDeliveryType() {
+    function setRunWaste(v) { document.getElementById('r_runWaste').value = v; calcRoll(); }
+    function markRunWasteBtns() {
+        const v = parseFloat(document.getElementById('r_runWaste').value);
+        document.querySelectorAll('.rw-btn').forEach(b => b.classList.toggle('active', parseFloat(b.dataset.v) === v));
+    }
+    function toggleTwoPassBox() {
+        const box = document.getElementById('r_p2Box');
+        if (box) box.style.display = document.getElementById('r_twoPass').checked ? 'block' : 'none';
+    }
+    function resetTwoPassFields() {   // ค่ากลางของ BSP 3231
+        const sp = machineSpecs.bsp3231;
+        document.getElementById('r_p2Setup').value = sp.setupMin; document.getElementById('r_p2Waste').value = sp.setupWaste;
+        document.getElementById('r_p2Speed').value = ''; document.getElementById('r_p2SpeedUnit').value = 'imp'; document.getElementById('r_p2PerStroke').value = '';
+        document.getElementById('r_p2Rate').value = sp.rate;
+    }
+    function toggleDeliveryType(fromUser) {
         const type = document.getElementById('r_deliveryType').value;
+        // v2.6.9: งานม้วน คนสลิทตรวจไปพร้อมกัน → ตรวจเช็ค 0 · งานตัดแผ่น คนห่อเป็นคนตรวจ → 0.5 (แก้เองได้)
+        if (fromUser) document.getElementById('r_ppCheck').value = type === 'roll' ? '0' : '0.5';
         const wrapper = document.getElementById('r_coreInputsWrapper');
         wrapper.style.display = type === 'roll' ? 'block' : 'none';
         const sp = document.getElementById('r_sheetPackWrapper');
@@ -2060,7 +2114,7 @@
         document.getElementById('r_runWaste').value = spec.runWaste;
         document.getElementById('r_hourlyRate').value = spec.rate;
         const twoPass = document.getElementById('r_twoPass');
-        if (machineKey === 'bsp3231' && twoPass) twoPass.checked = false;
+        if (machineKey === 'bsp3231' && twoPass) { twoPass.checked = false; toggleTwoPassBox(); }
         // รุ่นเพลท: Offset สั่งร้านนอก / Flexo ยิงเอง
         const pm = document.getElementById('pcPlateModel');
         if (pm) {
@@ -2467,12 +2521,12 @@
             if (document.getElementById('r_dieCostCalcBtn')) document.getElementById('r_dieCostCalcBtn').disabled = false;
             if (document.getElementById('r_inkCostCalcBtn')) document.getElementById('r_inkCostCalcBtn').disabled = false;
             document.getElementById('r_workType').value = "easy";
-            document.getElementById('r_twoPass').checked = false;
+            document.getElementById('r_twoPass').checked = false; resetTwoPassFields(); toggleTwoPassBox();
             document.getElementById('r_ppSlit').value = "0.5";
-            document.getElementById('r_ppCheck').value = "0.5";
+            document.getElementById('r_ppCheck').value = "0";
             document.getElementById('r_ppPack').value = "0.5";
             document.getElementById('r_ppFixed').value = "20";
-            document.getElementById('r_laborRate').value = String(STD_RATE_DEFAULT);
+            document.getElementById('r_laborRate').value = String(LABOR_RATE_DEFAULT);
             document.getElementById('r_commission').value = "0";
             document.getElementById('r_roundDec').value = "3";
             document.getElementById('r_margin').value = "43";
@@ -2865,6 +2919,8 @@
             hourlyRate: numVal('r_hourlyRate', 0), laborRate: numVal('r_laborRate', 0),
             pp: { slit: Math.max(0, numVal('r_ppSlit', 0)), check: Math.max(0, numVal('r_ppCheck', 0)), pack: Math.max(0, numVal('r_ppPack', 0)), fixed: Math.max(0, numVal('r_ppFixed', 0)) },
             twoPass: document.getElementById('r_twoPass').checked && machineKey !== 'bsp3231',
+            p2: { setup: Math.max(0, numVal('r_p2Setup', machineSpecs.bsp3231.setupMin)), waste: Math.max(0, numVal('r_p2Waste', machineSpecs.bsp3231.setupWaste)),
+                  speed: Math.max(0, numVal('r_p2Speed', 0)), unit: document.getElementById('r_p2SpeedUnit').value, perStroke: Math.max(0, numVal('r_p2PerStroke', 0)), rate: Math.max(0, numVal('r_p2Rate', machineSpecs.bsp3231.rate)) },
             locks: { hours: isLocked('hours'), ink: isLocked('ink'), plate: isLocked('plate') },
             manual: { hours: numVal('r_hours', 0), ink: numVal('r_inkCost', 0), plate: numVal('r_dieCost', 0) },   // ⚠️ id เดิม r_dieCost = "ค่าเพลทพิมพ์+ฟิล์ม"
             lockQty: { hours: lockQty('hours'), ink: lockQty('ink'), plate: lockQty('plate') },
@@ -2920,7 +2976,7 @@
         const netRows = qty > 0 ? Math.ceil(qty / across) : 0;
         const netMeters = netRows * pitch / 1000;   // ตามจำนวนสั่งพอดี (ไม่รวมเผื่อเสีย)
         const pass2Spec = machineSpecs.bsp3231;
-        const pass2Waste = p.twoPass ? pass2Spec.setupWaste : 0;
+        const pass2Waste = p.twoPass ? p.p2.waste : 0;   // v2.7.0: แก้ได้บนหน้าจอ
         const totalMeters = realMeters + p.waste + pass2Waste;
         const totalSqm = totalMeters * (p.webWidth / 1000);
 
@@ -2974,11 +3030,20 @@
         else if (p.speedUnit === 'imp') runMin = Math.ceil(rows / p.rowsPerRepeat) / speed;
         else runMin = rows / speed;
         const machineMin = qty > 0 ? p.setupMin + runMin : 0;
-        const pass2Speed = p.workType === 'hard' ? pass2Spec.speedHard : pass2Spec.speedEasy;
-        const pass2Min = (p.twoPass && qty > 0) ? pass2Spec.setupMin + rows / pass2Speed : 0;
+        // v2.7.0: ค่ากลางจากงานจริงที่ช่างสแกน (11/2569 เฉลี่ย 44 ครั้งกด/นาที ช่วง 30–50)
+        const pass2Speed = p.p2.speed > 0 ? p.p2.speed : (p.workType === 'hard' ? P2_SPEED_HARD : P2_SPEED_EASY);
+        const pass2Unit = p.p2.speed > 0 ? p.p2.unit : 'imp';
+        const pass2PerStroke = p.p2.perStroke > 0 ? p.p2.perStroke : Math.max(1, across * Math.max(1, p.rowsPerRepeat || 1));
+        const pass2Labels = rows * across;
+        let pass2Run = rows / pass2Speed;
+        if (pass2Unit === 'mpm') pass2Run = realMeters / pass2Speed;
+        else if (pass2Unit === 'lpm') pass2Run = pass2Labels / pass2Speed;
+        else if (pass2Unit === 'imp') pass2Run = Math.ceil(pass2Labels / pass2PerStroke) / pass2Speed;
+        const pass2Min = (p.twoPass && qty > 0) ? p.p2.setup + pass2Run : 0;
+        const pass2Rate = p.p2.rate;
         const postMin = qty > 0 ? p.pp.fixed + (p.pp.slit + p.pp.check + p.pp.pack) * (qty / 1000) : 0;
         const autoHours = (machineMin + pass2Min + postMin) / 60;
-        const autoOpCost = (machineMin / 60) * p.hourlyRate + (pass2Min / 60) * pass2Spec.rate + (postMin / 60) * p.laborRate;
+        const autoOpCost = (machineMin / 60) * p.hourlyRate + (pass2Min / 60) * pass2Rate + (postMin / 60) * p.laborRate;
         let hours = autoHours, operatingCost = autoOpCost;
         if (p.locks.hours) {
             hours = (ref && ref.autoHours > 0) ? p.manual.hours * autoHours / ref.autoHours : p.manual.hours;
@@ -3026,7 +3091,7 @@
             matCost, coreCostTotal, totalMatAndCore, finishedRollCount, boxCount, packCost, pkg,
             lamWidth, lamSqm, laminateCost, uvCost, foilCost, foilMeters, deadeningCost,
             inkAuto, inkCost, inkWidthFactor, inkBaseMeters, plateAuto, dieCost, plateCost,
-            speed, runMin, machineMin, pass2Min, postMin, autoHours, autoOpCost, hours, operatingCost,
+            speed, runMin, machineMin, pass2Min, pass2Speed, pass2Unit, pass2Rate, pass2PerStroke, postMin, autoHours, autoOpCost, hours, operatingCost,
             toolingCost, suppliesCost, otherCost, totalProductionCost, costPerUnit,
             rawSales, unitPrice, isOverride, isMinPriceApplied, salesRevenue, subtotal, commissionCost, profit,
             vatAmount, netTotal, marginPercent, markupPercent, hasActual, actualCost, actualProfit, actualMargin, actualMarkup
@@ -3250,8 +3315,10 @@
     }
 
     function calcRoll() {
+        toggleTwoPassBox(); markRunWasteBtns();
         const p = readRollInputs();
         const d = computeRoll(p, p.qty);
+        { const h = document.getElementById('r_p2Hint'); if (h && p.twoPass) h.innerText = `สปีดเว้นว่าง = ค่ากลางจากงานจริง (งานง่าย ${P2_SPEED_EASY} / งานยาก ${P2_SPEED_HARD} ครั้งกด/นาที) · ตอนนี้ใช้ ${d.pass2Speed} ${({row:'แถว',imp:'ครั้งกด',lpm:'ดวง',mpm:'เมตร'})[d.pass2Unit]}/นาที` + (d.pass2Unit === 'imp' ? ` · ${d.pass2PerStroke} ดวงต่อการกด` + (p.p2.perStroke > 0 ? '' : ' (เดา = ดวงต่อแถว × แถวต่อเพลท — ใส่จำนวนช่องบนบล็อกจริงจะแม่นกว่า)') : '') + ` → ${Math.round(d.pass2Min)} นาที`; }
         const marginX = 5;
         const currentMachine = p.spec;
         const $ = id => document.getElementById(id);
@@ -4823,6 +4890,8 @@
                 ppPack: document.getElementById('r_ppPack').value,
                 ppFixed: document.getElementById('r_ppFixed').value,
                 twoPass: document.getElementById('r_twoPass').checked,
+                p2Setup: document.getElementById('r_p2Setup').value, p2Waste: document.getElementById('r_p2Waste').value,
+                p2Speed: document.getElementById('r_p2Speed').value, p2SpeedUnit: document.getElementById('r_p2SpeedUnit').value, p2PerStroke: document.getElementById('r_p2PerStroke').value, p2Rate: document.getElementById('r_p2Rate').value,
                 hoursLock: document.getElementById('r_hoursLock').checked,
                 inkLock: document.getElementById('r_inkLock').checked,
                 plateLock: document.getElementById('r_plateLock').checked,
@@ -5198,6 +5267,12 @@
                 setV('r_laborRate', p.laborRate, String(STD_RATE_DEFAULT));
                 setV('r_ppSlit', p.ppSlit, '0.5'); setV('r_ppCheck', p.ppCheck, '0.5'); setV('r_ppPack', p.ppPack, '0.5'); setV('r_ppFixed', p.ppFixed, '20');
                 setC('r_twoPass', p.twoPass);
+                { const sp = machineSpecs.bsp3231;   // งานก่อน v2.7.0 ไม่มีค่าเหล่านี้ → ใช้ค่ากลางเดิม ราคาเท่าเดิม
+                  setV('r_p2Setup', p.p2Setup, String(sp.setupMin)); setV('r_p2Waste', p.p2Waste, String(sp.setupWaste));
+                  setV('r_p2SpeedUnit', p.p2SpeedUnit, 'imp'); setV('r_p2PerStroke', p.p2PerStroke, ''); setV('r_p2Rate', p.p2Rate, String(sp.rate));
+                  if (p.p2Setup === undefined) { setV('r_p2Speed', String(p.workType === 'hard' ? sp.speedHard : sp.speedEasy), ''); document.getElementById('r_p2SpeedUnit').value = 'row'; }   // สูตรเดิม แถว/นาที
+                  else setV('r_p2Speed', p.p2Speed, ''); }
+                toggleTwoPassBox();
                 setC('r_hoursLock', p.hoursLock); setC('r_inkLock', p.inkLock); setC('r_plateLock', p.plateLock);
                 setV('r_commission', p.commission, '0'); setV('r_roundDec', p.roundDec, '3');
                 if (p.plateModel) { document.getElementById('pcPlateModel').value = p.plateModel; fillPcPlateModel(); }
@@ -5211,7 +5286,7 @@
                 document.getElementById('r_boxType').value = 'manual'; setC('r_shrink', false);
                 setV('r_fileFee', '0', '0'); setV('r_foilPerM', '0', '0'); setV('r_commission', '0', '0');
                 setV('r_laborRate', p.hourlyRate, String(STD_RATE_DEFAULT));
-                setC('r_twoPass', false);
+                setC('r_twoPass', false); resetTwoPassFields(); toggleTwoPassBox();
                 setC('r_hoursLock', true); setC('r_inkLock', true); setC('r_plateLock', true);
                 setV('r_roundDec', '4', '4');
             }
@@ -5528,7 +5603,7 @@ function renderPcBreakdowns(p, d) {
             • จำนวนผลิตจริง: ${fmtB(d.produceQty, 0)} ดวง (${fmtB(d.rows, 0)} แถว · ${d.across} ดวง/แถว)<br>
             • สปีด: ${d.speed} ${unitTxt}<br>
             • ตั้งเครื่อง ${p.setupMin} นาที + วิ่งเครื่อง ${hm(d.runMin)} → ${fmtB(d.machineMin / 60 * p.hourlyRate, 0)} บาท (@${p.hourlyRate})<br>
-            ${d.pass2Min > 0 ? `• ไดคัทแยกเครื่อง BSP 3231: ${hm(d.pass2Min)} → ${fmtB(d.pass2Min / 60 * machineSpecs.bsp3231.rate, 0)} บาท<br>` : ''}
+            ${d.pass2Min > 0 ? `• ไดคัทแยกเครื่อง BSP 3231: ตั้งเครื่อง ${p.p2.setup} นาที + สปีด ${d.pass2Speed} ${({row:'แถว/นาที',imp:'ครั้งกด/นาที',lpm:'ดวง/นาที',mpm:'เมตร/นาที'})[d.pass2Unit]}${d.pass2Unit === 'imp' ? ` (${d.pass2PerStroke} ดวง/ครั้ง)` : ''} → ${hm(d.pass2Min)} → ${fmtB(d.pass2Min / 60 * d.pass2Rate, 0)} บาท (@${d.pass2Rate})<br>` : ''}
             • หลังพิมพ์ (สลิท/ตรวจ/แพ็ค): ${hm(d.postMin)} → ${fmtB(d.postMin / 60 * p.laborRate, 0)} บาท (@${p.laborRate})<br>
             -----------------------------------<br>
             • รวมค่าเครื่อง+แรงงาน: <b>${fmtB(d.autoOpCost, 0)} บาท</b>
