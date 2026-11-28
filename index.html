@@ -281,8 +281,15 @@
         .q-layout-img-wrap img { max-width: 100%; max-height: 360px; }
 
         .q-tier-box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; }
+        .q-page2-sep { text-align:center; font-size:11px; color:#94a3b8; border-top:2px dashed #cbd5e1; margin:18px 0 10px; padding-top:4px; }
+        .q-layout-page2 { margin-top: 0; }
+        .q-layout-page2 .q-layout-img-wrap img { max-height: 225mm; }
+        .q-layout-ref { font-size: 11px; color: #475569; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
         .q-tier-box-title { font-size: 12px; font-weight: bold; color: #0f172a; margin-bottom: 5px; }
         .q-tier-price-table { width: 100%; border-collapse: collapse; }
+        .q-tier-cols { display: flex; gap: 8px; align-items: flex-start; }
+        .q-tier-cols .q-tier-price-table { flex: 1; }
+        .q-tier-cols .q-tier-price-table th, .q-tier-cols .q-tier-price-table td { padding: 2px 8px; font-size: 11px; line-height: 1.3; }
         .q-tier-price-table th, .q-tier-price-table td { border: 1px solid #cbd5e1; padding: 4px 8px; font-size: 11.5px; }
         .q-tier-price-table th { background: #f1f5f9; color: #334155; text-align: left; font-weight: normal; }
         .q-tier-price-table td:last-child, .q-tier-price-table th:last-child { text-align: right; }
@@ -406,6 +413,8 @@
             .q-condition-box[contenteditable="true"], .q-note-box[contenteditable="true"] { outline: none !important; }
             .q-edit-hint { display: none !important; }
             .q-note-box:empty::before { content: none !important; }
+            .q-page2-sep { display: none !important; }
+            .q-layout-page2 { page-break-before: always; break-before: page; border: none; padding: 0; }
         }
 
         /* ===== v1.22.0 COMPACT MODE: ย่อบรรทัด/ช่องกรอกให้เล็กลง ประหยัดพื้นที่ (ไม่แตะสูตรคำนวณ) ===== */
@@ -603,11 +612,12 @@
     <div class="version-badge-row">
         <div class="version-badge-wrap">
             <div class="version-badge-line">
-                <div class="system-version-badge">V-Pack Estimator v2.7.2</div>
+                <div class="system-version-badge">V-Pack Estimator v2.7.3</div>
                 <button type="button" class="version-toggle-btn" id="versionToggleBtn" onclick="toggleVersionNotes()" aria-expanded="false" aria-controls="versionNotes">📜 ดูรายการอัปเดต ▾</button>
             </div>
             <div class="version-notes" id="versionNotes">
                 <ul>
+                    <li><b>v2.7.3</b> — ใบเสนอราคา: ย้ายแผนผังเลย์เอาท์ไปหน้า 2 (ภาพใหญ่ขึ้น) · ตารางราคาตามจำนวนขึ้นมาไว้ใต้รายการสินค้า</li>
                     <li><b>v2.7.2</b> — SANKI SMP-300 เผื่อเสียระหว่างวิ่งตั้งต้น 5% (เดิม 3%)</li>
                     <li><b>v2.7.1</b> — ปุ่มเผื่อเสียระหว่างวิ่ง: ล็อตใหญ่ 2.5% / ทั่วไป 5% / งานยาก 8% (จากรายงานของเสียจริง) + คำอธิบายย่อ</li>
                     <li><b>v2.7.0</b> — ไดคัทแยกเครื่อง BSP 3231: แก้ ตั้งเครื่อง/Waste/สปีด (แถว·ครั้งกด·เมตร ต่อนาที)/เรต ได้บนหน้าจอ</li>
@@ -1430,14 +1440,9 @@
         </tbody>
     </table>
 
-    <div class="q-layout-box" id="q_layoutBox">
-        <div class="q-layout-title">
-            <span>🖼️ แผนผังการวางเลย์เอาท์ (Layout Preview)</span>
-            <span class="q-layout-up" id="q_layoutUpText">-</span>
-        </div>
-        <div class="q-layout-img-wrap">
-            <img id="q_layoutImage" src="" alt="Layout Preview">
-        </div>
+    <div class="q-tier-box" id="q_tierBox" style="display:none;">
+        <div class="q-tier-box-title">💰 ตารางราคาตามปริมาณสั่งซื้อ (Volume Pricing) <span style="font-weight:normal; color:#64748b; font-size:11px;">· ราคาต่อดวง ไม่รวม VAT</span></div>
+        <div id="q_tierBody" class="q-tier-cols"></div>
     </div>
 
     <div class="q-total-box">
@@ -1491,14 +1496,6 @@
         </table>
     </div>
 
-    <div class="q-tier-box" id="q_tierBox" style="display:none;">
-        <div class="q-tier-box-title">💰 ตารางราคาตามปริมาณสั่งซื้อ (Volume Pricing)</div>
-        <table class="q-tier-price-table">
-            <thead><tr><th>ช่วงจำนวนสั่งซื้อ</th><th>ราคา/ดวง (ไม่รวม VAT)</th></tr></thead>
-            <tbody id="q_tierBody"></tbody>
-        </table>
-    </div>
-
     <div class="q-edit-hint">📝 สามารถคลิกที่กล่องเงื่อนไขด้านล่างเพื่อแก้ไข/เพิ่มข้อความเองได้ก่อนกดพิมพ์</div>
     <div class="q-condition-box" id="q_conditionBox" contenteditable="true" spellcheck="false">
         <b>เงื่อนไขการเสนอราคา:</b>
@@ -1525,6 +1522,19 @@
         <div class="q-print-meta">
             <span id="q_printMeta">พิมพ์เมื่อ: -</span>
             <span>เอกสารสร้างโดยระบบ V-Pack Estimator</span>
+        </div>
+    </div>
+
+    <!-- v2.7.3: แผนผังเลย์เอาท์ย้ายไปหน้า 2 (หน้าแรกเหลือที่ให้ตารางราคาตามจำนวน) -->
+    <div class="q-page2-sep">✂️ ── หน้า 2 : แผนผังเลย์เอาท์ ──</div>
+    <div class="q-layout-box q-layout-page2" id="q_layoutBox">
+        <div class="q-layout-ref" id="q_layoutRef">แนบท้ายใบเสนอราคา</div>
+        <div class="q-layout-title">
+            <span>🖼️ แผนผังการวางเลย์เอาท์ (Layout Preview)</span>
+            <span class="q-layout-up" id="q_layoutUpText">-</span>
+        </div>
+        <div class="q-layout-img-wrap">
+            <img id="q_layoutImage" src="" alt="Layout Preview">
         </div>
     </div>
 
@@ -4408,6 +4418,7 @@
         }
 
         document.getElementById('q_layoutImage').src = layoutImgDataUrl;
+        document.getElementById('q_layoutRef').innerText = `แนบท้ายใบเสนอราคาเลขที่ ${document.getElementById('q_no').innerText} · ${document.getElementById('q_custName').innerText} · ${document.getElementById('q_jobTitle').innerText}`;
         document.getElementById('q_layoutUpText').innerText = layoutUpLabel;
 
         const includeTierEl = document.getElementById(activeTab === 'sheet' ? 's_includeTierInQuote' : 'r_includeTierInQuote');
@@ -4415,7 +4426,14 @@
         const tierBody = document.getElementById('q_tierBody');
         const tierRows = lastTierRows[activeTab] || [];
         if (includeTierEl && includeTierEl.checked && tierRows.length) {
-            tierBody.innerHTML = tierRows.map(r => `<tr><td>${r.label}</td><td>${r.unit.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท/ดวง</td></tr>`).join('');
+            // v2.7.3: แถวเยอะ แบ่งเป็น 2–3 คอลัมน์ให้อยู่หน้าแรก
+            const nCol = tierRows.length > 14 ? 3 : (tierRows.length > 5 ? 2 : 1);
+            const per = Math.ceil(tierRows.length / nCol);
+            const tbl = rows => `<table class="q-tier-price-table"><thead><tr><th>จำนวนสั่งซื้อ</th><th>ราคา/ดวง</th></tr></thead><tbody>` +
+                rows.map(r => `<tr><td>${r.label}</td><td>${r.unit.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})} บาท</td></tr>`).join('') + `</tbody></table>`;
+            let cols = '';
+            for (let i = 0; i < nCol; i++) cols += tbl(tierRows.slice(i * per, (i + 1) * per));
+            tierBody.innerHTML = cols;
             tierBox.style.display = 'block';
         } else {
             tierBody.innerHTML = '';
